@@ -639,6 +639,13 @@ html[dir="ltr"]{ --h-panel-from: 100%; }
    working Desk, never a broken one. */
 :root{ --h-tabbar-h: 44px; }
 
+/* 🔴 مقاس فعليًا على هذا البنش (v16.31): body عنده display:flex؛
+   flex-direction:row (تقسيم السايدبار/المحتوى الأصلي) — والـJS بيحط
+   الـnav ده بـ`body.insertBefore(bar, body.firstChild)`، فبيبقى عنصر
+   فليكس تالت في نفس الصف الأفقي، بيتنازع على العرض مع .main-section
+   ويقصّه لعرض المحتوى الأصلي للسايدبار (~٢٢٠px) بدل الشاشة كاملة.
+   position:fixed بيشيله من تدفق الفليكس تمامًا — وbody{padding-top}
+   تحت بيعوّض المساحة بدل ما يتغطى المحتوى تحته. */
 .h-tab-bar{
   display: flex; align-items: flex-end; gap: 2px;
   background: var(--h-navy-950);
@@ -646,7 +653,11 @@ html[dir="ltr"]{ --h-panel-from: 100%; }
   min-height: var(--h-tabbar-h);
   overflow-x: auto; overflow-y: hidden;
   scrollbar-width: none;
+  position: fixed !important;
+  top: 0; inset-inline: 0;
+  z-index: 500;
 }
+html.h-tabs-ready body{ padding-top: var(--h-tabbar-h) !important; }
 .h-tab-bar::-webkit-scrollbar{ display: none; }
 .h-tab-bar .h-brand{
   display: flex; align-items: center; gap: 8px; padding: 0 12px 8px;
