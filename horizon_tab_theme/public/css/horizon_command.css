@@ -226,8 +226,17 @@ a:hover{ color: var(--h-navy); }
    connections/dashboard link-cards — becomes the chip.
    Uses !important throughout because it has to beat both Frappe's own
    `a{ color }` defaults AND, for the exception list below, its own base
-   rule — same justification as every other !important in this file. */
-a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item){
+   rule — same justification as every other !important in this file.
+
+   🔴 عطل حقيقي مقاس ٢٨ أغسطس: أربع `:not()` متتالية بتجمع تخصيصيتها
+   (0,4,1) — أعلى من كل استثناء تحت (`.h-tab-bar a` وأخواتها كلها
+   (0,1,1) أو قريب). فكانت كل الاستثناءات مهزومة فعليًا من القاعدة دي
+   من أول ما اتكتبت، مش بس التابات — التابات كلها (نشط وغير نشط) طلعت
+   بيضا بحدود كحلي، مش الشكل المقصود. `:where()` بتفرّغ تخصيصية اللي
+   جواها لصفر، فالقاعدة بقت (0,0,1) بس وأي استثناء تحت بيغلبها طبيعي —
+   السلوك (استبعاد .btn/.navbar-brand/.app-logo/.dropdown-item) ماتغيرش،
+   بس التخصيصية اتصفرت. مقاس بتعادل تخصيصية يدوي حي قبل التعديل. */
+a:where(:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item)){
   display: inline-flex !important;
   align-items: center;
   gap: 6px;
@@ -261,7 +270,7 @@ a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item){
 .wcard-link, .search-res{
   margin: 0 !important;
 }
-a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item):hover{
+a:where(:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item)):hover{
   background: var(--h-navy) !important;
   color: #fff !important;
   box-shadow: var(--h-shadow-1);
