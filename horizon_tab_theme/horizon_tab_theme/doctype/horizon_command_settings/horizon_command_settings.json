@@ -1,7 +1,7 @@
 {
  "doctype": "DocType",
  "name": "Horizon Command Settings",
- "module": "Horizon Command",
+ "module": "Horizon Tab Theme",
  "issingle": 1,
  "custom": 0,
  "engine": "InnoDB",

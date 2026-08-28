@@ -1,4 +1,9 @@
-# Horizon Command
+# Horizon Tab Theme
+
+> **اتسمّى قبل كده `horizon_command`.** اسم التطبيق التقني (`app_name`)
+> والريبو اتغيّروا مع تحديث الشريط الجانبي إلى تابات (الأدنى في الملف)
+> — دوكتايب `Horizon Command Settings` نفسه سايب اسمه القديم عمدًا (تغييره
+> كان هيغيّر اسم جدول قاعدة البيانات الحيّ).
 
 الثيم الرئيسي لعملاء Horizon SaaS — اتجاه "Command Center" الكثيف، مختار
 من بين ثلاث اتجاهات معروضة على نفس البيانات (كثيف/هادئ/تقليدي منظّم).
@@ -121,7 +126,7 @@
 ## التركيب
 
 ```bash
-bench get-app horizon_command /path/to/horizon-command/horizon_command
+bench get-app horizon_tab_theme /path/to/horizon-tab-theme/horizon_tab_theme
 bench --site <your-site> install-app horizon_command
 bench --site <your-site> migrate
 bench build --app horizon_command
