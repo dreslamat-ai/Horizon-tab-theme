@@ -1,0 +1,1176 @@
+/* ============================================================================
+   HORIZON COMMAND — Frappe v16 Desk theme
+   ============================================================================
+   A SEPARATE, self-contained app from horizon_theme — not an extension of
+   it, no shared assets, no dependency either way. Built after showing
+   three researched dashboard directions on identical data (dense "Command
+   Center" table-strip / calm "Editorial" / structured "Classic Enterprise")
+   and picking dense as this app's overall identity — but the DASHBOARD
+   layout itself was corrected after delivery from that dense table-strip
+   to the size-as-hierarchy bento layout shown in the very first prototype
+   (large AI anchor card, varying-size KPI cards) — see the "BENTO
+   DASHBOARD" section below for that correction's own note. Everything
+   else about the "dense" identity — the form/control density layer, the
+   Settings toggle for it — stands as originally decided; only the
+   dashboard's own layout changed.
+
+   Everything horizon_theme already proved out is carried over on purpose —
+   the navy-frame-with-shades control system, the icon-rail sidebar with its
+   CSS-only collapse trick, the "links become buttons" treatment, the
+   workflow colour palette, the live Settings→CSS mechanism — none of that
+   was re-invented, it was re-verified to still compile and then reused,
+   because rebuilding proven, tested groundwork from scratch would trade a
+   known-good foundation for a new set of untested assumptions for no
+   reason. What IS new in this file, layered on top:
+
+     1. A DENSITY PASS on forms and controls (search "DENSITY LAYER" below)
+        — horizon_theme's forms are spacious by design; this app's forms
+        are deliberately tighter, because the audience for this specific
+        app is the same power-user who wants a fast, dense data-entry
+        experience, doing it all day, not browsing occasionally. Exposed
+        as a live Settings toggle (compact/normal), not fixed.
+
+     2. The dashboard component classes (search "BENTO DASHBOARD" below)
+        are BUILT IN here, not an optional add-on file the way they
+        shipped in horizon_theme — because for this app, the dashboard
+        isn't an extra, it's the point.
+
+   Both --h-* (this file) and horizon_theme's own --h-* variables use the
+   same naming — that's fine and deliberate, not an oversight: each app
+   defines its own complete :root block in its own stylesheet, so there is
+   no runtime collision as long as the two aren't both loaded on the same
+   site at once, which matches how this is meant to be used (Horizon
+   Command is the SaaS default; horizon_theme remains available separately
+   for sites that want the calmer, more spacious look instead).
+
+   CUSTOMISATION NOTE: colours, font, control radius, form density, and
+   sidebar widths below are all --h-* custom properties for a reason —
+   every one is live-adjustable from Desk via Horizon Command Settings,
+   with zero CSS editing. That settings page works by serving a small
+   stylesheet (horizon_command/api.py:theme_css) loaded AFTER this file,
+   containing only :root{...} overrides for variables already declared
+   here — see hooks.py for the load order. The values in this file are the
+   SHIPPED DEFAULTS. Tajawal ships in 7 weights —
+   200/300/400/500/700/800/900 — note there is no 600, unlike Cairo, so
+   every font-weight rule below picks from that real set regardless of
+   which font Settings currently has selected. Font loading itself (which
+   Google Fonts URL, or none for "System Default") is also decided by that
+   same endpoint — this file never hardcodes a font URL.
+
+   v16 COMPATIBILITY NOTE — read before extending this file:
+   v16 shipped a genuinely new Desk shell (persistent per-app sidebar, an
+   Android-style "Apps" drawer, the document sidebar moved to the right).
+   That shell is new enough that its internal class names are still settling
+   upstream (see frappe/frappe#27499, #34734, #36791, #37646, #38182 — open
+   at time of writing). For that reason this file deliberately targets two
+   kinds of selectors differently:
+     - STABLE, long-lived Frappe classes (.btn, .indicator, .list-row,
+       .form-section, .modal, .frappe-control, .awesomplete, navbar) are
+       themed with confidence — these have been part of Frappe's public,
+       de-facto DOM contract for years.
+     - The NEW v16 shell (app switcher, per-app sidebar, apps drawer) is
+       themed only at the surface level (background/text colour on its
+       outermost stable wrapper) rather than with deep nested selectors,
+       because guessing at DOM that is still moving upstream would ship
+       rules that silently do nothing today and may target the wrong node
+       tomorrow. If you need deeper theming there, inspect your own instance
+       first and extend the "NEW V16 SHELL" section below — don't assume
+       this file already covers it.
+
+   COLOUR ALLOCATION — every colour below traces back to a specific brand
+   rule, documented here so nobody "fixes" it into a solid-colour scheme by
+   accident:
+     --h-navy    the voice. Primary chrome, primary buttons, headings.
+     --h-steel   accent on DARK surfaces ONLY (navbar/sidebar). Never used
+                 on a light background.
+     --h-blue    reserved for SUCCESS FEEDBACK only: "Saved", "Email sent",
+                 links, focus rings. It is NOT the default button colour —
+                 that's navy. Using blue for a generic primary button would
+                 spend the one colour that means "this worked" on ornament.
+     --h-amber   workflow status: pending / draft.
+     --h-green   workflow status: approved. Deliberately muted and distinct
+                 from --h-blue — a document being approved is a business
+                 state, not a "the system worked" confirmation; conflating
+                 the two would make both mean less.
+     --h-red     workflow status: rejected / cancelled / destructive.
+   ========================================================================== */
+:root{
+  --h-navy-950:#101A2B;
+  --h-navy-900:#16233A;
+  --h-navy:#1D2D44;
+  --h-navy-700:#2A3D5C;
+  --h-navy-500:#3D5170;
+  --h-navy-300:#7C8CA6;
+  --h-steel:#8FA8CC;
+  --h-steel-soft:rgba(143,168,204,.14);
+  --h-blue:#5083BC;
+  --h-blue-soft:rgba(80,131,188,.10);
+  --h-amber:#B8860B;
+  --h-amber-soft:rgba(184,134,11,.12);
+  --h-green:#4E7A5C;
+  --h-green-soft:rgba(78,122,92,.12);
+  --h-red:#B04A3F;
+  --h-red-soft:rgba(176,74,63,.10);
+
+  --h-ink:#1A1717;
+  --h-muted:#4A5361;
+  --h-faint:#69727F;
+  --h-paper:#F7F8F6;
+  --h-card:#FFFFFF;
+  --h-line:#E3E5E0;
+  --h-sand:#EDEEEA;
+
+  --h-on-dark:#EEF2F9;
+  --h-on-dark-2:#B6C2DA;
+  --h-on-dark-3:#8B9AB8;
+
+  --h-r-lg:16px;
+  --h-r-md:10px;
+  --h-r-sm:7px;
+  --h-shadow-1:0 1px 2px rgba(29,45,68,.05),0 6px 16px -8px rgba(29,45,68,.12);
+  --h-shadow-2:0 4px 10px rgba(29,45,68,.08),0 20px 44px -16px rgba(29,45,68,.22);
+  --h-font:'Tajawal','Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --h-mono:'JetBrains Mono','SFMono-Regular',Consolas,monospace;
+}
+
+/* ── typography ─────────────────────────────────────────────────────────── */
+body, .navbar, .modal, .form-control, .frappe-control label, .btn,
+.list-row, .page-title, h1,h2,h3,h4,h5,h6{
+  font-family: var(--h-font);
+}
+.frappe-code, .CodeMirror, pre, code, .console, .cm-editor{
+  font-family: var(--h-mono) !important;
+}
+body{ color: var(--h-ink); background: var(--h-paper); }
+a{ color: var(--h-blue); }
+a:hover{ color: var(--h-navy); }
+::selection{ background: var(--h-navy); color:#fff; }
+
+/* thin, branded scrollbars — cosmetic only, degrades gracefully where unsupported */
+*{ scrollbar-width: thin; scrollbar-color: var(--h-navy-300) transparent; }
+::-webkit-scrollbar{ width:10px; height:10px; }
+::-webkit-scrollbar-thumb{ background: var(--h-navy-300); border-radius: 99px; border:2px solid var(--h-paper); }
+::-webkit-scrollbar-thumb:hover{ background: var(--h-navy-500); }
+
+/* ── navbar (stable across versions) ───────────────────────────────────── */
+.navbar{
+  background: var(--h-navy-900) !important;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+  box-shadow: none;
+}
+.navbar .navbar-brand{ color: var(--h-on-dark) !important; }
+/* .navbar a / .navbar-nav link colour, hover and active states live in one
+   place only — the "links → buttons" exceptions block below — since that
+   block also has to cancel the global chip styling on these same links;
+   splitting the colour rules from that cancellation invites drift. */
+.navbar .icon-btn.active{ color: var(--h-steel) !important; }
+.navbar .app-logo{ filter: none; } /* the H mark ships pre-coloured — never rotate/outline/3D it, see brand rules */
+#navbar-search, .navbar .search-bar input{
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.16);
+  color: var(--h-on-dark);
+  border-radius: 99px;
+}
+#navbar-search::placeholder{ color: var(--h-on-dark-3); }
+#navbar-search:focus{
+  background: rgba(255,255,255,.14);
+  border-color: var(--h-steel);
+  box-shadow: 0 0 0 3px var(--h-steel-soft);
+}
+.navbar .octicon, .navbar svg{ color: var(--h-on-dark-2); }
+
+/* the icon-rail treatment for this element lives in one place, further
+   down ("icon rail, replacing the text sidebar") — colour + layout together,
+   so there's exactly one block to check if something looks off. */
+
+/* ── buttons ────────────────────────────────────────────────────────────── */
+.btn{ border-radius: var(--h-r-sm); font-weight: 700; }
+.btn-primary{
+  background: var(--h-navy) !important;
+  border-color: var(--h-navy) !important;
+  color:#fff !important;
+}
+.btn-primary:hover, .btn-primary:focus{
+  background: var(--h-navy-700) !important;
+  border-color: var(--h-navy-700) !important;
+}
+.btn-default, .btn-secondary{
+  background:#fff; border: 1.5px solid var(--h-navy-300); color: var(--h-navy);
+}
+.btn-default:hover{ border-color: var(--h-navy); background: var(--h-sand); }
+.btn-danger{ background: var(--h-red) !important; border-color: var(--h-red) !important; }
+.btn:focus-visible{ outline: 2px solid var(--h-navy); outline-offset: 2px; }
+
+/* primary "save" / submit action in the form footer — same rule, called out
+   separately because Frappe gives it its own selector in some views */
+.page-actions .btn-primary, .standard-actions .btn-primary, .form-footer .btn-primary{
+  background: var(--h-navy) !important; border-color: var(--h-navy) !important;
+}
+
+/* ── links → buttons ────────────────────────────────────────────────────
+   Every navigational link in Desk becomes a small navy-bordered pill —
+   fills navy-on-white on hover — instead of plain underlined blue text.
+   Two DELIBERATE usability exceptions, not stylistic ones:
+     • rendered user content (comments, timeline text, any markdown/rich-
+       text field) — an external URL someone pasted into a comment has to
+       stay a normal inline hyperlink; wrapping every link inside a
+       paragraph in its own bordered pill makes the text unreadable.
+     • .dropdown-menu items — a dropdown already IS a list of actions;
+       nesting a bordered pill inside another box per row is a well-known
+       anti-pattern (reads as cramped/broken, not "chic").
+   List-row links (the clickable value in a table cell) are reset back to
+   plain bold-navy text for the same reason as rich content: a dense list
+   with 8 columns of bordered pills stops being scannable as a table.
+   Everything else — breadcrumbs, list-sidebar filters, form-sidebar
+   "assigned to / tags / attachments" links, standard-actions extra links,
+   connections/dashboard link-cards — becomes the chip.
+   Uses !important throughout because it has to beat both Frappe's own
+   `a{ color }` defaults AND, for the exception list below, its own base
+   rule — same justification as every other !important in this file. */
+a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item){
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 13px !important;
+  border: 1.5px solid var(--h-navy) !important;
+  border-radius: 999px !important;
+  color: var(--h-navy) !important;
+  background: #fff !important;
+  font-weight: 700;
+  font-size: .86em;
+  text-decoration: none !important;
+  line-height: 1.5;
+  transition: background .18s, color .18s, box-shadow .18s;
+}
+a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item):hover{
+  background: var(--h-navy) !important;
+  color: #fff !important;
+  box-shadow: var(--h-shadow-1);
+}
+
+/* exceptions — see the rationale above for each group. Every property the
+   chip rule sets with !important must be explicitly reset here too — two
+   !important declarations on the same property always resolve by SOURCE
+   ORDER, so leaving even one property untouched (color, in an earlier draft
+   of this file) lets the chip rule silently win it back. */
+.workspace-sidebar a, [class*="sidebar"][class*="workspace"] a{
+  display: flex !important; border: none !important; background: transparent !important;
+  padding: 0 !important; border-radius: var(--h-r-sm) !important;
+  color: var(--h-on-dark-2) !important;
+}
+.workspace-sidebar a:hover, [class*="sidebar"][class*="workspace"] a:hover{
+  color: #fff !important; background: rgba(255,255,255,.08) !important;
+}
+.workspace-sidebar a.selected, [class*="sidebar"][class*="workspace"] a.selected{ color: #fff !important; }
+.navbar a, .navbar .navbar-nav > li > a{
+  display: inline-flex !important; border: none !important; background: transparent !important;
+  padding: 8px 10px !important; border-radius: 8px !important;
+  color: var(--h-on-dark) !important;
+}
+.navbar .navbar-nav > li > a:hover, .navbar .navbar-nav > li > a:focus{ color: #fff !important; }
+.navbar .navbar-nav > li > a.active{ color: var(--h-steel) !important; }
+.list-row a, .list-row-col a{
+  display: inline !important; border: none !important; background: transparent !important;
+  padding: 0 !important; border-radius: 0 !important; color: var(--h-navy) !important;
+  font-weight: 700; text-decoration: none !important;
+}
+.list-row a:hover, .list-row-col a:hover{ text-decoration: underline !important; background: transparent !important; }
+.comment-content a, .timeline-content a, .frappe-timeline a,
+.ql-editor a, .markdown-preview a, .text-editor a{
+  display: inline !important; border: none !important; background: transparent !important;
+  padding: 0 !important; border-radius: 0 !important; color: var(--h-blue) !important;
+  font-weight: 700; text-decoration: underline !important;
+}
+
+/* ── status indicators (dots + pills) — the workflow palette ─────────────
+   Frappe's own indicator colour classes (.orange/.green/.red/...) are the
+   stable public hook here; we remap them rather than hunting for doctype-
+   specific status logic, so this covers docstatus, ToDo, workflow state,
+   and any custom doctype that reuses the standard indicator component. */
+.indicator.orange, .indicator-pill.orange, .indicator.yellow, .indicator-pill.yellow{
+  color: var(--h-amber) !important;
+}
+.indicator.orange::before, .indicator-pill.orange .indicator-pill-icon,
+.indicator.yellow::before, .indicator-pill.yellow .indicator-pill-icon{
+  background: var(--h-amber) !important;
+}
+.indicator.green, .indicator-pill.green{ color: var(--h-green) !important; }
+.indicator.green::before, .indicator-pill.green .indicator-pill-icon{
+  background: var(--h-green) !important;
+}
+.indicator.red, .indicator-pill.red, .indicator.pink, .indicator-pill.pink{
+  color: var(--h-red) !important;
+}
+.indicator.red::before, .indicator-pill.red .indicator-pill-icon,
+.indicator.pink::before, .indicator-pill.pink .indicator-pill-icon{
+  background: var(--h-red) !important;
+}
+.indicator.blue, .indicator-pill.blue{ color: var(--h-blue) !important; }
+.indicator.blue::before, .indicator-pill.blue .indicator-pill-icon{
+  background: var(--h-blue) !important;
+}
+.indicator.grey, .indicator.gray, .indicator-pill.grey, .indicator-pill.gray{
+  color: var(--h-faint) !important;
+}
+.indicator-pill{ border-radius: 99px; font-weight: 700; font-size: .74rem; }
+
+/* ── toasts / alerts — this is where "blue = success" actually lives ────── */
+.alert-message, .desk-alert, .frappe-toast-message{
+  border-radius: var(--h-r-md); font-weight: 700;
+}
+.alert-success, .frappe-toast-message.success{
+  border-inline-start: 3px solid var(--h-blue);
+  background: var(--h-blue-soft);
+  color: var(--h-navy-900);
+}
+.alert-danger, .frappe-toast-message.error{
+  border-inline-start: 3px solid var(--h-red);
+  background: var(--h-red-soft);
+}
+.alert-warning, .frappe-toast-message.warning{
+  border-inline-start: 3px solid var(--h-amber);
+  background: var(--h-amber-soft);
+}
+
+/* ── list view ─────────────────────────────────────────────────────────── */
+.list-row{ border-color: var(--h-line); }
+.list-row:hover{ background: var(--h-sand); }
+.list-row-checkbox:checked ~ *, .list-row.checked, .list-row-container.checked{
+  background: var(--h-blue-soft) !important;
+}
+.list-sidebar .list-link.active a, .list-sidebar .list-link.selected a{
+  color: var(--h-navy); font-weight: 700;
+}
+.list-sidebar .list-link a:hover{ color: var(--h-navy); }
+.page-head, .list-view .page-head{ background: var(--h-paper); border-color: var(--h-line); }
+
+/* ── forms — navy frame, in shades, on every control ──────────────────────
+   "بلمسات ودرجات": not one flat line — the border and background both carry
+   navy at different strengths per state, so the control reads as "framed in
+   the brand" rather than merely outlined. Rest state uses the lightest navy
+   (navy-300) so a form with 20 fields doesn't turn into a wall of dark
+   lines; hover deepens one step; focus goes to full navy plus a soft navy
+   glow. None of this uses --h-blue — blue stays reserved for the toast/
+   success family above, a focus ring is a framing cue, not a "this
+   succeeded" signal. */
+.form-control, textarea.form-control, select.form-control,
+input[type="text"], input[type="number"], input[type="date"],
+input[type="email"], input[type="tel"], input[type="url"], input[type="search"]{
+  border: 1.5px solid var(--h-navy-300);
+  border-radius: var(--h-r-sm);
+  background: linear-gradient(180deg, #fff, var(--h-paper) 180%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6), inset 0 0 0 1px rgba(29,45,68,.02);
+  transition: border-color .18s, box-shadow .18s;
+}
+.form-control:hover, select.form-control:hover{
+  border-color: var(--h-navy-500);
+}
+.form-control:focus, textarea.form-control:focus, select.form-control:focus{
+  border-color: var(--h-navy);
+  box-shadow: 0 0 0 3px rgba(29,45,68,.12), inset 0 1px 0 rgba(255,255,255,.6);
+  background: #fff;
+}
+.form-control:disabled, .form-control[disabled]{
+  border-color: var(--h-line); background: var(--h-sand); box-shadow: none;
+}
+/* checkboxes / radios — same family, so a form with mixed control types
+   still reads as one frame system rather than native-grey checkboxes next
+   to navy-framed text inputs. */
+input[type="checkbox"], input[type="radio"]{
+  accent-color: var(--h-navy);
+  outline: 1px solid var(--h-navy-300);
+  outline-offset: 1px;
+}
+input[type="checkbox"]:checked, input[type="radio"]:checked{
+  outline-color: var(--h-navy);
+}
+.form-section .section-head, .form-tabs .nav-link{
+  color: var(--h-navy-900); font-weight: 700;
+}
+.form-tabs .nav-link.active{
+  color: var(--h-navy);
+  border-bottom-color: var(--h-navy) !important;
+}
+.frappe-control label{ color: var(--h-muted); font-weight: 500; font-size: .82em; }
+.control-label{ color: var(--h-muted); }
+.form-sidebar .sidebar-label{ color: var(--h-faint); }
+
+/* ── DENSITY LAYER — the thing that actually makes this "Command Center" ──
+   horizon_theme deliberately left .form-control padding to Frappe's own
+   default. Here it's set explicitly, and — unlike horizon_theme — through
+   variables Horizon Command Settings can override, so density itself is
+   the one setting this app exposes that horizon_theme's panel never
+   needed to: this app's whole identity IS its density, so it's the one
+   knob worth putting in the user's hands rather than baking in as fixed.
+   Numbers get monospace + tabular alignment everywhere a value is likely
+   to be currency or a quantity — not just in the dashboard, in ordinary
+   form fields too, so a "Rate" or "Qty" field reads the same disciplined
+   way research flagged as a defining trait of Stripe/Mercury-calibre
+   financial UI. */
+:root{ --h-form-pad: 6px 10px; --h-form-font: .87rem; }
+.form-control, textarea.form-control, select.form-control,
+input[type="text"], input[type="number"], input[type="date"],
+input[type="email"], input[type="tel"], input[type="url"], input[type="search"]{
+  padding: var(--h-form-pad);
+  font-size: var(--h-form-font);
+}
+.frappe-control label{ font-size: .76rem; margin-bottom: 3px; }
+.form-section{ margin-bottom: 14px; }
+.form-section .section-head{ font-size: .78rem; padding-bottom: 6px; margin-bottom: 10px; }
+.form-column .frappe-control{ margin-bottom: 10px; }
+.control-value, [data-fieldtype="Currency"] .static-area, [data-fieldtype="Int"] .static-area,
+[data-fieldtype="Float"] .static-area{
+  font-family: 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+.list-row{ min-height: 38px; }
+.page-head{ padding-block: 10px; }
+
+/* ── modals / dialogs ──────────────────────────────────────────────────── */
+.modal-content{ border-radius: var(--h-r-lg); border: 1px solid var(--h-line); box-shadow: var(--h-shadow-2); }
+.modal-header{ border-color: var(--h-line); }
+.modal-title{ color: var(--h-navy-900); font-weight: 800; }
+
+/* ── slide-in child table row editor ──────────────────────────────────────
+   Idea seen in a third-party Frappe v16 theme (vineyrawat/saas_theme,
+   MIT-licensed, README-documented) — but this is NOT a port of their code.
+   Their actual CSS/JS wasn't reachable from here (GitHub blocked fetching
+   past the README), so what follows is an independent implementation of
+   the same idea, built against Frappe's own selectors with the confidence
+   level each one actually earns:
+
+   `.grid-row-open-form` (the wrapper Frappe's grid_row.js expands when you
+   open a row for full editing) is LONG-STANDING core Frappe grid
+   infrastructure — the same category of "stable, years-old, public DOM
+   contract" as `.modal`/`.list-row` elsewhere in this file, not the newer,
+   still-settling v16 shell. Turning its default in-place expansion into a
+   fixed-position slide-in panel is CSS-only — position, transform,
+   transition on an element Frappe already creates and already toggles
+   open/closed itself, so no JS is needed to control it.
+
+   VERIFY-AFTER-INSTALL NOTE: "long-standing" is not the same as
+   "guaranteed unchanged in every v16 point release." If a row's editor
+   doesn't visually slide in on your instance, open dev tools on an actual
+   grid row's expand icon and confirm `.grid-row-open-form` is still the
+   wrapper class before assuming this section is broken — Frappe may have
+   renamed it, in which case update the selector here rather than the
+   idea. */
+.grid-row-open-form{
+  position: fixed !important;
+  top: 0; bottom: 0;
+  inset-inline-end: 0;
+  width: min(92vw, 480px) !important;
+  max-width: none !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  background: #fff;
+  box-shadow: -8px 0 32px -12px rgba(16,26,43,.35);
+  z-index: 95;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: slideInPanel .28s var(--h-spring, cubic-bezier(.22,1,.36,1));
+  border-radius: 0;
+  border-inline-start: 1px solid var(--h-line);
+}
+@keyframes slideInPanel{
+  from{ transform: translateX(var(--h-panel-from, 100%)); opacity: .6; }
+  to{ transform: translateX(0); opacity: 1; }
+}
+html[dir="rtl"]{ --h-panel-from: -100%; }
+html[dir="ltr"]{ --h-panel-from: 100%; }
+.grid-row-open-form .form-in-grid{ padding: 18px 20px; flex: 1; }
+.grid-row-open-form .form-column{ padding-inline: 0; }
+/* header/footer stay visible at all times while the body scrolls, per the
+   same "every action button reachable without scrolling" idea */
+.grid-row-open-form .row-form-heading,
+.grid-row-open-form .form-toolbar{
+  position: sticky; background: #fff; z-index: 2;
+  border-bottom: 1px solid var(--h-line); padding: 12px 20px;
+}
+.grid-row-open-form .row-form-heading{ top: 0; font-weight: 900; color: var(--h-navy-900); }
+.grid-row-open-form .form-toolbar{ bottom: 0; border-top: 1px solid var(--h-line); border-bottom: none; }
+@media (max-width: 640px){
+  .grid-row-open-form{ width: 100vw !important; }
+}
+
+/* ── desk homepage — workspace icon grid ──────────────────────────────────
+   The /app landing screen (the grid of workspace shortcuts you see right
+   after login) is part of v16's NEW shell — the least stable part of Desk
+   this whole theme touches, same caveat as the sidebar. Themed at surface
+   level only (colours, card radius, hover lift on whatever the outer
+   shortcut-card wrapper turns out to be) rather than assuming a specific
+   grid-column count or nested structure, for the same reason: confident
+   guesses at settling internals age badly. `[class*="shortcut"]` and
+   `[class*="widget-box"]` are deliberately broad substring matches, not
+   exact class names, so this survives minor renames the exact-match
+   selectors elsewhere in this file wouldn't. */
+[class*="shortcut"][class*="widget"], [class*="widget-box"]{
+  border-radius: var(--h-r-lg) !important;
+  border-color: var(--h-line) !important;
+  transition: transform .2s var(--h-spring, ease), box-shadow .2s !important;
+}
+[class*="shortcut"][class*="widget"]:hover, [class*="widget-box"]:hover{
+  transform: translateY(-3px);
+  box-shadow: var(--h-shadow-1) !important;
+  border-color: var(--h-navy-300) !important;
+}
+
+/* ── awesomplete / suggestion dropdowns ───────────────────────────────── */
+.awesomplete ul{
+  border: 1.5px solid var(--h-navy-300); border-radius: var(--h-r-md); box-shadow: var(--h-shadow-1);
+}
+.awesomplete li:hover, .awesomplete li[aria-selected="true"]{
+  background: var(--h-sand);
+}
+
+/* ── timeline / comments ──────────────────────────────────────────────── */
+.timeline-dot{ background: var(--h-navy-300); }
+.comment-box, .timeline-item{ border-color: var(--h-line); }
+.avatar, .avatar-frame{ background: var(--h-navy-700); color:#fff; }
+
+/* ── grid / child table — the item table in invoices, journal entries,
+   quotations, anywhere a doctype has a Table field ────────────────────────
+   Unlike the sidebar section above, this targets a LONG-STANDING, stable
+   part of Frappe (frappe/public/js/frappe/form/grid.js and grid_row.js) —
+   the same system since early Frappe, not the newer v16 shell — so this is
+   themed with real confidence, not the heavier "verify after install"
+   hedging the sidebar needed. `.grid-static-col[data-fieldname] .static-area`
+   and `.grid-row[data-name]` are documented, actively-referenced selectors
+   (still current per Frappe's own dev docs as of mid-2026). */
+.grid-heading-row{
+  background: var(--h-sand);
+  border-bottom: 1.5px solid var(--h-navy-300);
+  font-weight: 800; color: var(--h-navy-900); font-size: .82em;
+}
+.grid-row{
+  border-bottom: 1px solid var(--h-line);
+  transition: background .15s;
+}
+.grid-row:hover{ background: var(--h-paper); }
+.grid-row.grid-row-selected, .grid-row.selected{
+  background: var(--h-blue-soft) !important;
+}
+.grid-static-col{
+  border-inline-end: 1px solid var(--h-line);
+}
+.grid-static-col .static-area{
+  color: var(--h-ink); font-size: .86em; padding: 7px 10px;
+}
+.grid-static-col[data-fieldname] .static-area:hover{
+  background: var(--h-sand); cursor: text;
+}
+/* the row-number / checkbox column reads as chrome, not data — dimmed */
+.row-index, .grid-row-check{ color: var(--h-faint); }
+/* editable cell input, in edit mode — same navy-frame-with-shades family
+   as every other control in this theme, not a bare native input */
+.grid-row input.input-sm, .grid-row select.input-sm,
+.grid-row textarea.input-sm{
+  border: 1.5px solid var(--h-navy-300) !important;
+  border-radius: 6px;
+  background: #fff;
+}
+.grid-row input.input-sm:focus, .grid-row select.input-sm:focus{
+  border-color: var(--h-navy) !important;
+  box-shadow: 0 0 0 2px rgba(29,45,68,.1);
+}
+/* "Add Row" and the grid's own footer/total strip */
+.grid-footer{ background: var(--h-paper); border-top: 1px solid var(--h-line); }
+.grid-footer .btn, .grid-add-row{
+  color: var(--h-navy); font-weight: 700; font-size: .84em;
+}
+.grid-footer .grid-total-row, .grid-total-row{
+  font-weight: 900; color: var(--h-navy-900);
+}
+/* the small expand-row arrow that opens the full row-form for a non-inline-
+   editable child doctype — recolour so it doesn't sit as a stray grey icon */
+.grid-row .btn-open-row, .grid-row .row-index .octicon{ color: var(--h-navy-300); }
+.grid-row .btn-open-row:hover{ color: var(--h-navy); }
+
+/* ── kanban ────────────────────────────────────────────────────────────── */
+.kanban-column-header{ color: var(--h-navy-900); font-weight: 800; }
+.kanban-card{ border-radius: var(--h-r-md); box-shadow: var(--h-shadow-1); }
+
+/* ── report / query report toolbar ────────────────────────────────────── */
+.report-summary .summary-value{ color: var(--h-navy-900); }
+/* Charts (frappe-charts) read their palette from data passed by the report
+   script, not from CSS — see saas_lead_funnel.py / saas_revenue_retention.py
+   in the SaaS kit, which already pass ["#1D2D44","#5083BC"] explicitly. If
+   you add report-level colour theming here, verify the frappe-charts config
+   API on your actual v16 build first — don't guess a global override. */
+
+/* ── login (desk-embedded variant, e.g. session-expired modal) ──────────── */
+.page-card{ border-radius: var(--h-r-lg); box-shadow: var(--h-shadow-2); border-color: var(--h-line); }
+.page-card-head{ color: var(--h-navy-900); font-weight: 800; }
+
+/* ── motion & accessibility ───────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
+:focus-visible{ outline: 2px solid var(--h-navy); outline-offset: 2px; }
+
+/* ── NEW V16 SHELL — text sidebar, open by default ────────────────────────
+   Brought back from the earlier "radical redesign" project (glassmorphism
+   version, verified on demo.horizonerp.cloud) — but reimplemented here as a
+   pure CSS technique instead of the JS-built rail that project used, for the
+   same reason the rest of this file avoids assuming v16 internals: v16's
+   sidebar is still moving upstream (frappe/frappe#27499, #34734, #37646,
+   #38182 — all opened Jan–Mar 2026), so code that reads Frappe's internal
+   workspace list to build a custom rail could silently break on the next
+   point release. (horizon_rail.js — the one JS file this theme ships — adds
+   the open/close button below; it doesn't read any of that internal data
+   either, see the file's own header for why that keeps it safe.)
+
+   STATE MODEL — deliberately the opposite of an earlier draft of this file,
+   worth naming so nobody "fixes" it back by accident: the sidebar's OPEN,
+   full-width, names-visible look is the CSS DEFAULT — no class needed. A
+   `h-sidebar-collapsed` class, added by horizon_rail.js, is what narrows it
+   to the 68px icon-only rail. This way the sidebar is correct on first
+   paint with zero JavaScript having run yet — there's no flash of the wrong
+   state while the toggle script loads. The COLLAPSED state still needs
+   ZERO knowledge of child markup to work: narrow the container and hide
+   overflow. Every nav pattern renders [icon][text] in that order with a
+   fixed-width icon first, so a narrow, overflow-hidden container clips the
+   text and leaves the icon visible — without ever selecting the text node
+   directly. If Frappe already sets a `title` attribute on these links (it
+   does, for accessibility), the browser's native tooltip shows the
+   workspace name on hover in that collapsed state — no JS required for
+   that either.
+
+   VERIFY-AFTER-INSTALL NOTE: this targets the sidebar by the same broad
+   selector as the section above, on purpose (see that section's comment).
+   If your instance's actual sidebar wrapper uses a different class, open
+   dev tools, find the real one, and add it to the selector list below —
+   don't guess at nested internals beyond that. The hierarchy-shading block
+   further down carries a SECOND, separate uncertainty of its own — flagged
+   there specifically, since it's a bigger guess than everything else here. */
+:root{ --h-rail-w: 68px; --h-rail-w-open: 232px; }
+
+/* base = OPEN. full width, names visible, scrollable if the list is long. */
+.workspace-sidebar, [class*="sidebar"][class*="workspace"]{
+  width: var(--h-rail-w-open) !important;
+  min-width: var(--h-rail-w-open) !important;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-top: 78px; /* room for the logo tile below */
+  position: relative;
+  background: var(--h-navy-900);
+  border-inline-end: 1px solid rgba(255,255,255,.08);
+  box-shadow: var(--h-shadow-2);
+}
+/* logo tile at the top of the rail — a decorated ::before, so it never
+   touches real DOM. Swap the "H" for a background-image once you have the
+   brand-book PNG if you want the exact mark instead of a CSS letter. */
+.workspace-sidebar::before, [class*="sidebar"][class*="workspace"]::before{
+  content: "H";
+  position: absolute;
+  top: 14px; inset-inline-start: 50%;
+  transform: translateX(-50%);
+  width: 40px; height: 40px;
+  border-radius: var(--h-r-sm);
+  background: #fff; color: var(--h-navy);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 1.1rem; font-family: var(--h-font);
+}
+html[dir="rtl"] .workspace-sidebar::before,
+html[dir="rtl"] [class*="sidebar"][class*="workspace"]::before{
+  transform: translateX(50%);
+}
+/* links, open/base look: full row, name visible, icon + text side by side */
+.workspace-sidebar a, [class*="sidebar"][class*="workspace"] a{
+  align-items: center; justify-content: flex-start;
+  width: 100%; height: 44px;
+  white-space: nowrap; overflow: hidden;
+  margin-bottom: 2px; padding-inline: 16px !important; gap: 12px;
+  /* border/background/padding-reset/colour for this selector are set in
+     the "links → buttons" exceptions block above — kept there on purpose,
+     since that's also where they have to beat the global chip rule's
+     !important. Splitting layout (here) from colour (there) for the same
+     element is not ideal, but merging them would mean either duplicating
+     the rail's layout up next to the button code (worse for readability)
+     or moving the whole button-exclusion system down here (breaks the
+     "exceptions right next to what they're excepting from" structure).
+     This comment is the pointer between the two halves. */
+}
+.workspace-sidebar a.selected, .workspace-sidebar a.active,
+[class*="sidebar"][class*="workspace"] a.selected{
+  background: rgba(143,168,204,.18) !important; /* !important: must beat the
+    exceptions block's own `background: transparent !important` above,
+    which applies to every rail link including this more-specific state */
+  border-inline-start: 2px solid var(--h-steel);
+}
+.workspace-sidebar .sec, .workspace-sidebar [class*="section-title"],
+[class*="sidebar"][class*="workspace"] [class*="section-title"]{
+  display: block; padding: 16px 16px 6px; font-size: .7rem; font-weight: 800;
+  letter-spacing: .05em; text-transform: uppercase; color: var(--h-on-dark-3) !important;
+}
+
+/* ── rail — COLLAPSED state ────────────────────────────────────────────
+   Toggled by horizon_rail.js adding `h-sidebar-collapsed` on <html> — on
+   outside-click, on clicking a link inside the rail, or by hand via the
+   toggle button. Narrows the container back down and re-clips the text,
+   the exact inverse of the base rules above. */
+html.h-sidebar-collapsed .workspace-sidebar,
+html.h-sidebar-collapsed [class*="sidebar"][class*="workspace"]{
+  width: var(--h-rail-w) !important;
+  min-width: var(--h-rail-w) !important;
+  overflow: hidden;
+  box-shadow: none;
+}
+html.h-sidebar-collapsed .workspace-sidebar a,
+html.h-sidebar-collapsed [class*="sidebar"][class*="workspace"] a{
+  width: var(--h-rail-w) !important;
+  justify-content: center !important;
+  padding-inline: 0 !important;
+}
+html.h-sidebar-collapsed .workspace-sidebar .sec,
+html.h-sidebar-collapsed .workspace-sidebar [class*="section-title"],
+html.h-sidebar-collapsed [class*="sidebar"][class*="workspace"] [class*="section-title"]{
+  display: none; /* pure text with no icon — clipping it would leave a blank row */
+}
+/* collapsed rail: hierarchy shading doesn't apply — nested items aren't
+   visible at all at 68px, so reset the depth padding/tint back to flat.
+   (The hierarchy rules themselves live further down, scoped to the base/
+   open state only, so this reset only matters if a future edit removes
+   that scoping — kept here as a guard, cheap insurance either way.) */
+html.h-sidebar-collapsed .workspace-sidebar li li a,
+html.h-sidebar-collapsed [class*="sidebar"][class*="workspace"] li li a{
+  padding-inline-start: 0 !important;
+  background: transparent !important;
+}
+
+/* the toggle button — one real element injected once by horizon_rail.js,
+   pinned to the rail's outer edge in both states (logical `inset-inline-end`
+   so it lands correctly whether the page is RTL or LTR without a separate
+   rule). Rendered as a navy circle so it reads as a control, not a link —
+   deliberately NOT run through the "links → buttons" chip treatment above
+   even though it's technically a <button>, since that rule only ever
+   touched <a> elements to begin with. */
+.h-rail-toggle{
+  position: absolute;
+  top: 78px; /* sits just under the logo tile */
+  inset-inline-end: -13px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: var(--h-navy);
+  border: 2px solid var(--h-navy-950);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  box-shadow: var(--h-shadow-1);
+  transition: background .18s, transform .25s;
+}
+.h-rail-toggle:hover{ background: var(--h-navy-700); }
+.h-rail-toggle svg{ transition: transform .25s; }
+/* arrow points "close" (inward) when open — the default — and flips to
+   point "open" (outward) once collapsed, so it always previews what
+   clicking it will do next rather than what state you're currently in. */
+html.h-sidebar-collapsed .h-rail-toggle svg{ transform: rotate(180deg); }
+
+/* ── hierarchy shading — parent/child depth, in navy shades ──────────────
+   Scoped to the OPEN/base state only — collapsed shows icons alone, so
+   depth has nothing to attach to there (see the reset above).
+   THIS BLOCK CARRIES MORE UNCERTAINTY than the rest of the file and is
+   flagged as such deliberately, not silently shipped as if verified: it's
+   the one place this theme has to guess at NESTED markup, not just an
+   outer wrapper. Two techniques are stacked so whichever matches your
+   actual v16 instance takes effect — check dev tools after installing and
+   delete whichever block does nothing on your instance:
+     (a) STRUCTURAL depth — assumes children render as nested <li>/<ul>,
+         the conventional way to build any tree/nested-list UI. If true,
+         no class names need to match at all, at any depth.
+     (b) EXPLICIT depth markers — assumes Frappe instead flags depth with
+         something like `data-level="1"` or a `level-1` class on a flat
+         list (plausible for v16's rebuilt sidebar). The `[class*="level-N"]`
+         / `[data-level="N"]` selectors below cover that case.
+   Depth reads as "receding into the rail" rather than "more important":
+   each level down gets a touch more steel tint and a touch less weight,
+   the opposite direction from how the selected-state highlight (above)
+   uses steel — that one marks "current", these mark "nested". */
+html:not(.h-sidebar-collapsed) .workspace-sidebar li li a,
+html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] li li a,
+html:not(.h-sidebar-collapsed) [class*="level-1"] > a,
+html:not(.h-sidebar-collapsed) [data-level="1"] > a{
+  padding-inline-start: 30px !important;
+  background: rgba(143,168,204,.07) !important;
+  font-weight: 700;
+  font-size: .93em;
+}
+html:not(.h-sidebar-collapsed) .workspace-sidebar li li li a,
+html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] li li li a,
+html:not(.h-sidebar-collapsed) [class*="level-2"] > a,
+html:not(.h-sidebar-collapsed) [data-level="2"] > a{
+  padding-inline-start: 44px !important;
+  background: rgba(143,168,204,.12) !important;
+  font-weight: 500;
+  font-size: .89em;
+}
+html:not(.h-sidebar-collapsed) .workspace-sidebar li li li li a,
+html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] li li li li a,
+html:not(.h-sidebar-collapsed) [class*="level-3"] > a,
+html:not(.h-sidebar-collapsed) [data-level="3"] > a{
+  padding-inline-start: 58px !important;
+  background: rgba(143,168,204,.17) !important;
+  font-weight: 500;
+  font-size: .86em;
+}
+
+/* ── mobile ────────────────────────────────────────────────────────────
+   768px matches Frappe's own Bootstrap-based breakpoint (md), so this lines
+   up with where Frappe's native layout already starts adapting, rather than
+   picking an arbitrary number of my own.
+
+   The sidebar's desktop default is OPEN — deliberately, per the earlier
+   decision above. On a phone that same default would hand over 60%+ of the
+   viewport to the sidebar before the person has even done anything, so
+   mobile gets the opposite default: START narrow, and let the toggle turn
+   it into a temporary FULL-HEIGHT OVERLAY (position:fixed) rather than an
+   inline flex sibling — an inline expand would still squeeze the content
+   column to almost nothing on a narrow screen. Collapsing it back returns
+   it to the normal, non-overlay, narrow-rail flow — no compensating margin
+   needed anywhere else, because in that state it behaves exactly like the
+   desktop *collapsed* rail always has. */
+@media (max-width: 768px){
+  .workspace-sidebar, [class*="sidebar"][class*="workspace"]{
+    width: var(--h-rail-w) !important;
+    min-width: var(--h-rail-w) !important;
+    overflow: hidden;
+  }
+  .workspace-sidebar a, [class*="sidebar"][class*="workspace"] a{
+    width: var(--h-rail-w) !important;
+    justify-content: center !important;
+    padding-inline: 0 !important;
+  }
+  .workspace-sidebar .sec, .workspace-sidebar [class*="section-title"],
+  [class*="sidebar"][class*="workspace"] [class*="section-title"]{
+    display: none;
+  }
+  /* hierarchy shading has nothing to attach to at icon-only width */
+  .workspace-sidebar li li a, [class*="sidebar"][class*="workspace"] li li a{
+    padding-inline-start: 0 !important; background: transparent !important;
+  }
+
+  /* the OPEN state on mobile = a temporary overlay drawer, not a squeeze */
+  html:not(.h-sidebar-collapsed) .workspace-sidebar,
+  html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"]{
+    position: fixed !important;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: min(78vw, 280px) !important;
+    min-width: min(78vw, 280px) !important;
+    overflow-y: auto; overflow-x: hidden;
+    z-index: 90;
+    box-shadow: 0 0 0 2000px rgba(16,23,38,.55), var(--h-shadow-2);
+    /* the oversized spread shadow doubles as a dim backdrop over the
+       content behind it, without needing a second DOM element for one —
+       a real backdrop div would need its own click-to-dismiss wiring,
+       which duplicates logic horizon_rail.js already has for "tap outside
+       the sidebar" */
+  }
+  html:not(.h-sidebar-collapsed) .workspace-sidebar a,
+  html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] a{
+    width: 100% !important; justify-content: flex-start !important;
+    padding-inline: 16px !important;
+  }
+  html:not(.h-sidebar-collapsed) .workspace-sidebar .sec,
+  html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] [class*="section-title"]{
+    display: block;
+  }
+  html:not(.h-sidebar-collapsed) .workspace-sidebar li li a,
+  html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] li li a{
+    padding-inline-start: 30px !important; background: rgba(143,168,204,.07) !important;
+  }
+
+  /* the navbar search box is the other fixed-width element that overflows
+     a phone screen first — let it shrink instead of forcing a scrollbar */
+  #navbar-search, .navbar .search-bar input{ width: auto; min-width: 0; flex: 1; }
+
+  /* grid/child-table columns — best effort, see note: a phone can't fit 6+
+     accounting columns at readable width no matter how this is tuned, so
+     rather than crush every column to an unreadable sliver, force a
+     minimum row width and let the row's own container scroll horizontally.
+     `.form-grid` is the wrapper this assumes exists; if your instance's
+     wrapper differs, the min-width on the row itself is a safety net either
+     way — worst case the whole page scrolls sideways instead of a broken
+     inner scrollbar, which is recoverable, silently-crushed columns are not. */
+  .form-grid, .grid-body{ overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .grid-heading-row, .grid-row{ min-width: 560px; }
+}
+
+/* ── RTL ───────────────────────────────────────────────────────────────
+   Frappe already flips layout direction for Arabic; the rules above use
+   inline-* logical properties wherever a side was involved, so no separate
+   [dir="rtl"] block is needed here. */
+
+/* ── staying on-brand under Frappe's own Dark theme ───────────────────────
+   Users can still pick "Dark" from Settings → desk_theme (a real, documented
+   field on the User doctype — see README) and we don't take that choice away
+   from them. What we DO is make sure Horizon's palette wins even then, so
+   the product never looks like stock Frappe dark mode. This is CSS-only —
+   no JS needed to detect or react to the toggle.
+   Brand default: if you want every user to start on Light, set a Property
+   Setter on User.desk_theme (default = "Light") — that's the sanctioned
+   mechanism; this stylesheet is not the place to force it. */
+[data-theme="dark"]{
+  --h-navy-950:#0B1220; --h-navy-900:#131F33;
+}
+[data-theme="dark"] body{ background: var(--h-navy-950); color: var(--h-on-dark); }
+[data-theme="dark"] .page-card,
+[data-theme="dark"] .modal-content,
+[data-theme="dark"] .form-control,
+[data-theme="dark"] .awesomplete ul{
+  background: var(--h-navy-900); border-color: rgba(255,255,255,.12); color: var(--h-on-dark);
+}
+[data-theme="dark"] .list-row:hover,
+[data-theme="dark"] .awesomplete li:hover{ background: rgba(255,255,255,.06); }
+[data-theme="dark"] .frappe-control label,
+[data-theme="dark"] .control-label{ color: var(--h-on-dark-3); }
+[data-theme="dark"] a{ color: var(--h-steel); }
+[data-theme="dark"] .btn-primary{ background: var(--h-blue) !important; border-color: var(--h-blue) !important; }
+/* indicators, navbar and buttons above already use tokens that read fine on
+   dark — only surfaces that Frappe itself inverts need a rule here. */
+
+
+/* ══════════════════════════════════════════════════════════════════════
+   BENTO DASHBOARD — the direction actually picked, corrected from an
+   earlier draft of this file
+   ══════════════════════════════════════════════════════════════════════
+   An earlier version of this app shipped the dense "Command Center" table-
+   strip dashboard (the `cc-*` classes) — that was a MISREAD: when three
+   researched directions were shown side by side on identical data, dense/
+   Command-Center was picked as the label for the overall app and its form
+   density, but the DASHBOARD direction actually wanted is the size-as-
+   hierarchy bento layout — the large AI anchor card plus varying-size KPI
+   cards — which was the very first prototype shown, before the three-way
+   comparison existed. This section replaces the table-strip with that
+   original bento layer, verbatim from the tested prototype.
+
+   Nothing else in this app changes because of that correction: the dense
+   form/control sizing above (search "DENSITY LAYER") is a genuinely
+   separate decision from dashboard layout — a spacious bento dashboard and
+   compact data-entry forms aren't in tension, and Horizon Command Settings
+   still exposes both independently (colours + form density here; dashboard
+   layout itself isn't a runtime setting, the same way it wasn't for the
+   table-strip version — it's a structural choice, not a token). */
+:root{
+  /* 8px base grid — bento cells and gaps are all multiples of this,
+     per the sizing convention in every 2026 bento guide reviewed */
+  --h-space-1: 4px; --h-space-2: 8px; --h-space-3: 12px; --h-space-4: 16px;
+  --h-space-6: 24px; --h-space-8: 32px;
+  --h-bento-radius: 18px;
+  --h-canvas: #F4F6F5; /* calmer than pure white — Mercury/Ramp's dashboard
+                           backdrop is never stark white behind the cards,
+                           it's what makes white CARDS read as elevated */
+}
+
+.dash-canvas{ background: var(--h-canvas); padding: var(--h-space-6); min-height: 100%; }
+
+.dash-head{ display:flex; justify-content:space-between; align-items:flex-end; margin-bottom: var(--h-space-6); flex-wrap:wrap; gap:12px; }
+.dash-head h1{ font-size:1.5rem; font-weight:900; color:var(--h-navy-900); margin:0; }
+.dash-head .sub{ font-size:.85rem; color:var(--h-muted); font-weight:600; margin-top:4px; }
+
+/* ── the grid itself ──────────────────────────────────────────────────── */
+.bento-grid{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 118px;
+  gap: var(--h-space-4);
+}
+@media (max-width: 900px){ .bento-grid{ grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 560px){ .bento-grid{ grid-template-columns: 1fr; grid-auto-rows: auto; } }
+
+.bento-card{
+  background:#fff; border:1px solid var(--h-line); border-radius: var(--h-bento-radius);
+  padding: var(--h-space-4) var(--h-space-4);
+  box-shadow: 0 1px 2px rgba(29,45,68,.04);
+  display:flex; flex-direction:column;
+  transition: box-shadow .2s, transform .2s;
+  overflow:hidden; position:relative;
+}
+.bento-card:hover{ box-shadow: 0 8px 24px -10px rgba(29,45,68,.16); }
+.span-2x2{ grid-column: span 2; grid-row: span 2; }
+.span-2x1{ grid-column: span 2; }
+.span-1x2{ grid-row: span 2; }
+@media (max-width: 560px){ .span-2x2,.span-2x1,.span-1x2{ grid-column: span 1 !important; grid-row: auto !important; } }
+
+/* ── the AI anchor card — navy, largest cell, always top-start ─────────── */
+.bento-ai{
+  background: linear-gradient(155deg, var(--h-navy-700), var(--h-navy-950));
+  color:#fff; border:none;
+  box-shadow: 0 20px 50px -20px rgba(16,26,43,.5);
+}
+.bento-ai::before{
+  content:""; position:absolute; inset:0;
+  background: radial-gradient(60% 50% at 100% 0%, rgba(143,168,204,.28), transparent 70%);
+}
+.bento-ai .ai-tag{ position:relative; display:inline-flex; align-items:center; gap:7px;
+  font-size:.72rem; font-weight:800; color:var(--h-steel); margin-bottom:14px; }
+.bento-ai .ai-tag .dot{ width:6px;height:6px;border-radius:50%; background:var(--h-steel); animation:aiPulse 2s infinite; }
+@keyframes aiPulse{ 0%,100%{opacity:.4} 50%{opacity:1} }
+.bento-ai h3{ position:relative; font-size:1.15rem; font-weight:800; line-height:1.6; margin:0 0 10px; color:#fff; max-width:34ch; }
+.bento-ai p{ position:relative; font-size:.86rem; color:rgba(255,255,255,.72); font-weight:600; line-height:1.9; margin:0 0 16px; max-width:38ch; }
+.bento-ai .ai-actions{ position:relative; display:flex; gap:8px; margin-top:auto; }
+.bento-ai .ai-btn{ background:#fff; color:var(--h-navy); font-weight:800; font-size:.8rem;
+  padding:8px 16px; border-radius:99px; border:none; cursor:pointer; }
+.bento-ai .ai-btn.ghost{ background:rgba(255,255,255,.12); color:#fff; border:1px solid rgba(255,255,255,.25); }
+
+/* ── KPI cards — one number, tabular, restrained ─────────────────────── */
+.bento-kpi .k-label{ font-size:.74rem; font-weight:800; color:var(--h-faint); text-transform:uppercase; letter-spacing:.02em; }
+.bento-kpi .k-value{ font-size:1.7rem; font-weight:900; color:var(--h-navy-900); font-variant-numeric:tabular-nums;
+  margin-top:auto; line-height:1.1; }
+.bento-kpi .k-value small{ font-size:.5em; font-weight:800; color:var(--h-faint); margin-inline-start:4px; }
+.bento-kpi .k-trend{ font-size:.76rem; font-weight:800; margin-top:6px; display:flex; align-items:center; gap:4px; }
+.bento-kpi .k-trend.up{ color:var(--h-blue); }
+.bento-kpi .k-trend.warn{ color:var(--h-amber); }
+.bento-kpi .k-trend.down{ color:var(--h-red); }
+
+/* ── mini sparkline card ─────────────────────────────────────────────── */
+.bento-chart .k-label{ font-size:.74rem; font-weight:800; color:var(--h-faint); text-transform:uppercase; margin-bottom:8px; }
+.spark{ display:flex; align-items:flex-end; gap:4px; flex:1; }
+.spark b{ flex:1; background:var(--h-line); border-radius:3px 3px 1px 1px; transform-origin:bottom; }
+.spark b.hi{ background:var(--h-navy); }
+
+/* ── activity list card ──────────────────────────────────────────────── */
+.bento-activity .act-row{ display:flex; align-items:center; gap:10px; padding:7px 0; border-bottom:1px solid var(--h-line); font-size:.82rem; }
+.bento-activity .act-row:last-child{ border-bottom:none; }
+.bento-activity .act-dot{ width:7px;height:7px;border-radius:50%; flex:none; }
+.bento-activity .act-txt{ flex:1; color:var(--h-ink); font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.bento-activity .act-time{ color:var(--h-faint); font-size:.74rem; font-weight:700; flex:none; }
+
+/* ── dense table card (accountant density, per research: power users want
+   density; the dashboard around it stays calm — density lives INSIDE one
+   card, not across the whole screen) ─────────────────────────────────── */
+.bento-table table{ width:100%; border-collapse:collapse; font-size:.82rem; }
+.bento-table th{ text-align:start; font-size:.7rem; font-weight:800; color:var(--h-faint); text-transform:uppercase;
+  padding:0 0 8px; border-bottom:1px solid var(--h-line); }
+.bento-table th.num, .bento-table td.num{ text-align:end; font-variant-numeric:tabular-nums; }
+.bento-table td{ padding:8px 0; border-bottom:1px solid var(--h-line); color:var(--h-ink); font-weight:600; }
+.bento-table tr:last-child td{ border-bottom:none; }
+
+/* ── empty state — onboarding, not a blank box ───────────────────────── */
+.bento-empty{ display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center;
+  flex:1; gap:8px; padding:10px; }
+.bento-empty .e-ic{ width:38px;height:38px;border-radius:10px; background:var(--h-sand); color:var(--h-navy-300);
+  display:grid; place-items:center; margin-bottom:4px; }
+.bento-empty .e-t{ font-size:.82rem; font-weight:800; color:var(--h-navy-900); }
+.bento-empty .e-d{ font-size:.74rem; color:var(--h-faint); font-weight:600; max-width:20ch; }
+.bento-empty a{ margin-top:6px; }
+
+@media (prefers-color-scheme: dark){
+  .dash-canvas{ background: var(--h-canvas) !important; }
+  .bento-card{ background-color:#fff !important; }
+  .bento-ai{ background: linear-gradient(155deg, var(--h-navy-700), var(--h-navy-950)) !important; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════
+   v16.31 SHELL COMPATIBILITY — مقيسة على DOM الفعلي لهذا البنش (٢٦ أغسطس):
+   السايدبار في v16.31 هو .body-sidebar-container > .body-sidebar —
+   عائلة .workspace-sidebar الأصلية فوق لا تطابقه إطلاقًا فكان الرايل
+   كله ميتًا (مقيس بمتصفح حقيقي: querySelector رجّع null). الطبقة دي
+   إضافة في آخر الملف عمدًا — الأصل محفوظ كما سُلّم، والتكرار هنا مقصود
+   عشان أي رجوع لـDOM القديم يفضل شغالًا برضه.
+   ════════════════════════════════════════════════════════════════════ */
+.body-sidebar-container{
+  background: var(--h-navy) !important;
+  width: var(--h-rail-w-open) !important;
+  min-width: var(--h-rail-w-open) !important;
+  transition: width .18s ease, min-width .18s ease;
+  overflow: hidden;
+}
+/* الابنة .body-sidebar بترسم خلفية فاتحة خاصة بها فوق الحاوية وبتغطيها
+   بالكامل (مقيس على theme.horizonerp: الحاوية rgb(29,45,68) والابنة
+   rgb(248,248,248) فوقها — نفس العطب اتقاس واتصلح في horizon_theme) */
+.body-sidebar-container .body-sidebar{ background: transparent !important; }
+html.h-sidebar-collapsed .body-sidebar-container{
+  width: var(--h-rail-w) !important;
+  min-width: var(--h-rail-w) !important;
+}
+html.h-sidebar-collapsed .body-sidebar-container .sidebar-item-label{ display: none !important; }
+/* استثناء قاعدة الشيبس العامة لروابط السايدبار الجديد — نفس منطق استثناء
+   العائلة القديمة حرفيًا: كل خاصية !important في قاعدة الشيبس تتصفّر هنا */
+/* الخصوصية (0,5,1) عمدًا — قاعدة الشيبس العامة (0,4,1) بأربع :not،
+   والاستثناء لازم يغلبها بالخصوصية لا بترتيب المصدر (كلاهما !important) */
+.body-sidebar-container a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item){
+  display: flex !important; border: none !important; background: transparent !important;
+  padding: 6px 10px !important; border-radius: 8px !important;
+  color: #fff !important; box-shadow: none !important;
+}
+.body-sidebar-container a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item):hover{ background: rgba(255,255,255,.14) !important; color: #fff !important; box-shadow: none !important; }
+.body-sidebar-container .sidebar-item-label{ color: #fff !important; }
+.body-sidebar-container .sidebar-item-icon svg{ stroke: #fff !important; }
+
+/* ════════════════════════════════════════════════════════════════════════
+   v16.31 — الميزتان الجديدتان على DOM هذا البنش الفعلي (مقيس ٢٦ أغسطس):
+
+   ١) محرر الصف: `.grid-row-open-form` القديم غير موجود إطلاقًا في v16.31 —
+      المحرر بقى `.form-in-grid` داخل `.grid-row-open`، وهو fixed أصلًا
+      كمودال متوسّط (900px، z-index 1021) بخلفية `.modal-backdrop.grid-form`.
+      قياس playwright: querySelector('.grid-row-open-form') = null والبنية
+      الحقيقية اتطبعت سلسلة آباء كاملة. كتلة الأصل فوق محفوظة كما سُلّمت
+      (لو Frappe رجع للـDOM القديم تشتغل)، ودي الطبقة المقابلة للجديد.
+
+   ٢) الرئيسية: مفيش [class*="widget-box"] ولا [class*="shortcut"][class*=
+      "widget"] في القشرة الجديدة — لا في /desk ولا جوه صفحات الـworkspace
+      (مقيس: صفر تطابق في الاتنين). كروت الرئيسية الحقيقية هي
+      `.icons-container .desktop-icon`. سيلكتورات الأصل السطحية باقية فوق
+      (بتشتغل لو الكلاسات رجعت)، ودول المقيسون هنا.
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── ١) محرر الصف المنزلق — على بنية v16.31 الحقيقية */
+.grid-row-open .form-in-grid{
+  top: 0 !important; bottom: 0 !important;
+  inset-inline-end: 0 !important;
+  inset-inline-start: auto !important;
+  left: auto; right: auto;
+  width: min(92vw, 480px) !important;
+  max-width: none !important;
+  height: 100vh !important;
+  margin: 0 !important;
+  background: #fff;
+  box-shadow: -8px 0 32px -12px rgba(16,26,43,.35);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  /* القشرة بتوسّط المحرر بـtransform: translateX(240px) (مقيس matrix
+     e=240) — يتصفّر بـ!important، والانزلاق على خاصية translate المستقلة
+     لأن keyframes ماتقدرش تغلب إعلان !important على transform نفسه */
+  transform: none !important;
+  animation: slideInPanelV2 .28s var(--h-spring, cubic-bezier(.22,1,.36,1));
+  border-radius: 0 !important;
+  border-inline-start: 1px solid var(--h-line);
+}
+@keyframes slideInPanelV2{
+  from{ translate: var(--h-panel-from, 100%) 0; opacity: .6; }
+  to{ translate: 0 0; opacity: 1; }
+}
+/* العنوان (صف التحرير #ن وأزرار الإدراج/الحذف) ثابت فوق والجسم بيسكرول */
+.grid-row-open .form-in-grid .grid-form-heading{
+  position: sticky; top: 0; background: #fff; z-index: 2;
+  border-bottom: 1px solid var(--h-line); padding: 12px 16px;
+  font-weight: 900; color: var(--h-navy-900);
+}
+.grid-row-open .form-in-grid .grid-form-body{ padding: 14px 16px; flex: 1; }
+.grid-row-open .form-in-grid .form-column{ padding-inline: 0; }
+/* الخلفية المعتمة بتاعة v16.31 نفسه — نخففها لإحساس اللوحة الجانبية */
+.modal-backdrop.grid-form{ opacity: .25 !important; }
+@media (max-width: 640px){
+  .grid-row-open .form-in-grid{ width: 100vw !important; }
+}
+
+/* ── ٢) كروت الرئيسية — البنية المقيسة فعليًا في v16.31:
+   a.desktop-icon (دايرة بيضا 127px radius:999) > .icon-container (مربع
+   الأيقونة 54px radius:16) + .icon-caption. الدايرة تصميم القشرة الأصلي —
+   ما نفرضش عليها radius مربع؛ الرفعة والظل بيتبعوا الاستدارة تلقائيًا.
+   مسكوب على .desktop-container (الرئيسية) عشان درج التطبيقات الجانبي
+   اللي بيشارك نفس كلاس .desktop-icon ما يتحركش */
+.desktop-container .desktop-icon{
+  transition: transform .2s var(--h-spring, ease), box-shadow .2s !important;
+}
+.desktop-container .desktop-icon:hover{
+  transform: translateY(-3px);
+  box-shadow: var(--h-shadow-1) !important;
+}
+.desktop-container .desktop-icon:hover .icon-container{
+  background: var(--h-navy-050, #eef2f7) !important;
+}

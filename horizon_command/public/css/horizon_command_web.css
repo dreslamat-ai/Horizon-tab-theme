@@ -1,0 +1,66 @@
+/* ============================================================================
+   HORIZON COMMAND — login / portal pages (/login, /me, error pages)
+   These are served through Frappe's WEBSITE bundle, not the Desk bundle —
+   horizon_desk.css never reaches this page, hence a separate small file.
+   ========================================================================== */
+:root{
+  --h-navy-950:#101A2B; --h-navy-900:#16233A; --h-navy:#1D2D44; --h-navy-700:#2A3D5C; --h-navy-300:#7C8CA6;
+  --h-steel:#8FA8CC; --h-blue:#5083BC;
+  --h-ink:#1A1717; --h-muted:#4A5361; --h-line:#E3E5E0; --h-paper:#F7F8F6;
+  --h-r-lg:20px; --h-r-sm:10px;
+  --h-shadow-2:0 20px 50px -18px rgba(16,26,43,.35);
+  --h-font:'Tajawal','Inter',-apple-system,'Segoe UI',sans-serif;
+}
+body.login-page{
+  font-family: var(--h-font);
+  background: radial-gradient(1100px 600px at 50% -10%, var(--h-navy-700) 0%, var(--h-navy) 45%, var(--h-navy-950) 100%);
+  min-height: 100vh;
+}
+.page-card{
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: var(--h-r-lg);
+  box-shadow: var(--h-shadow-2);
+  background: #fff;
+}
+.page-card-head .indicator{ display:none; } /* default Frappe brand dot — the logo already carries the brand */
+.page-card-head h4, .page-card-head .card-title{
+  color: var(--h-navy-900); font-weight: 900;
+}
+#login-page .app-logo, .login-content .app-logo{
+  border-radius: var(--h-r-sm);
+}
+.btn-login, #page-login .btn-primary{
+  background: var(--h-navy) !important; border-color: var(--h-navy) !important;
+  border-radius: var(--h-r-sm); font-weight: 700;
+}
+.btn-login:hover{ background: var(--h-navy-700) !important; }
+
+/* links → chip buttons, same treatment and same reasoning as horizon_desk.css.
+   "Forgot password" / "Sign up instead" are the only links on this page, and
+   they're navigational actions, not rendered content, so no exceptions
+   needed here the way Desk needs them for comments/timeline text. */
+#login-page a, .for-forgot a, .for-signup a{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 13px; border: 1.5px solid var(--h-navy); border-radius: 999px;
+  color: var(--h-navy); background: #fff; font-weight: 700; font-size: .86em;
+  text-decoration: none; transition: background .18s, color .18s;
+}
+#login-page a:hover, .for-forgot a:hover, .for-signup a:hover{
+  background: var(--h-navy); color: #fff;
+}
+
+/* navy frame, in shades, on every control — same system as Desk's forms */
+.login-content .form-control, .page-card input, .page-card select{
+  border: 1.5px solid var(--h-navy-300);
+  border-radius: var(--h-r-sm);
+  background: linear-gradient(180deg, #fff, var(--h-paper) 180%);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
+  transition: border-color .18s, box-shadow .18s;
+}
+.login-content .form-control:hover{ border-color: var(--h-navy-500); }
+.login-content .form-control:focus{
+  border-color: var(--h-navy);
+  box-shadow: 0 0 0 3px rgba(29,45,68,.12), inset 0 1px 0 rgba(255,255,255,.6);
+  background: #fff;
+}
+::selection{ background: var(--h-navy); color:#fff; }

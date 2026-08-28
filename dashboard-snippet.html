@@ -1,0 +1,79 @@
+<!--
+  Horizon Command — Bento dashboard snippet
+  ============================================================================
+  استخدامه: Desk → مساحة العمل بتاعتك → Edit → أضف "HTML Block" → الصق ده.
+  "مبني داخليًا" في اسم القسم بملف الـCSS بيعني إن الأنماط دي محمّلة على كل
+  صفحة ديسك تلقائيًا (مش ملف اختياري منفصل زي horizon_theme) — لكن الماركب
+  نفسه (الـHTML) لسه محتاج يتحط في مكان ما، وده بيحصل هنا بالظبط زي
+  horizon_theme تمامًا: مفيش صفحة تلقائية بتتولّد وحدها.
+
+  الأرقام تحت أمثلة — استبدلها بقيم حقيقية، أو بمتغيرات Jinja لو الـWorkspace
+  بيدعم ده في نسختك. كل الألوان بتتبع Horizon Command Settings تلقائيًا.
+  ============================================================================
+-->
+<div class="dash-canvas">
+  <div class="dash-head">
+    <div>
+      <h1>صباح الخير، إسلام 👋</h1>
+      <div class="sub">الثلاثاء 25 أغسطس 2026 — 6 مشاريع نشطة، 3 أوامر تشغيل قيد التنفيذ</div>
+    </div>
+  </div>
+
+  <div class="bento-grid">
+
+    <div class="bento-card bento-ai span-2x2">
+      <span class="ai-tag"><span class="dot"></span> الاء — تحليل اليوم</span>
+      <h3>هامش مشروع النخيل نزل من 16.4٪ لـ 9.1٪ الشهر ده</h3>
+      <p>السبب بندين في جدول الكميات تخطوا التقديري بـ31٪ بسبب سعر خامة اتغيّر، ومعاهم 3 أوامر تغيير منفّذة بقيمة 214,000 لسه ما اتعتمدتش من المالك.</p>
+      <div class="ai-actions">
+        <button class="ai-btn">جهّز مطالبة</button>
+        <button class="ai-btn ghost">التفاصيل كاملة</button>
+      </div>
+    </div>
+
+    <div class="bento-card bento-kpi">
+      <div class="k-label">صافي المركز النقدي</div>
+      <div class="k-value">2.14<small>م ر.س</small></div>
+      <div class="k-trend up">▲ 4.2٪ عن الأسبوع الماضي</div>
+    </div>
+
+    <div class="bento-card bento-kpi">
+      <div class="k-label">انحراف التكلفة — أوامر التشغيل</div>
+      <div class="k-value">+3.1<small>٪</small></div>
+      <div class="k-trend warn">أمر #2214 وحده سبب نصفه</div>
+    </div>
+
+    <div class="bento-card bento-kpi">
+      <div class="k-label">ديون متأخرة (+90 يوم)</div>
+      <div class="k-value">96.3<small>ألف ر.س</small></div>
+      <div class="k-trend down">مؤسسة الأفق — فاتورة SI-039</div>
+    </div>
+
+    <div class="bento-card bento-kpi">
+      <div class="k-label">هامش الشهر الحالي</div>
+      <div class="k-value">14.6<small>٪</small></div>
+      <div class="k-trend up">▲ 1.8 نقطة عن أغسطس</div>
+    </div>
+
+    <div class="bento-card bento-table span-2x1">
+      <div class="k-label" style="margin-bottom:8px">أحدث الفواتير</div>
+      <table>
+        <tr><th>العميل</th><th class="num">القيمة</th><th></th></tr>
+        <tr><td>مؤسسة الأفق</td><td class="num">4,297.80</td>
+          <td><span class="indicator-pill green" style="padding:2px 9px;font-size:.7rem">مدفوعة</span></td></tr>
+        <tr><td>شركة النخيل</td><td class="num">18,400,000</td>
+          <td><span class="indicator-pill orange" style="padding:2px 9px;font-size:.7rem">غير مدفوعة</span></td></tr>
+        <tr><td>مصنع الرياض</td><td class="num">612,400</td>
+          <td><span class="indicator-pill green" style="padding:2px 9px;font-size:.7rem">مدفوعة</span></td></tr>
+      </table>
+    </div>
+
+    <div class="bento-card bento-activity span-2x1">
+      <div class="k-label" style="margin-bottom:6px">آخر الأنشطة</div>
+      <div class="act-row"><span class="act-dot" style="background:var(--h-green)"></span><span class="act-txt">تم اعتماد قيد JV-2026-00089</span><span class="act-time">قبل 10 د</span></div>
+      <div class="act-row"><span class="act-dot" style="background:var(--h-blue)"></span><span class="act-txt">فاتورة SI-2026-00042 اتحصّلت — 4,297.80</span><span class="act-time">قبل ساعة</span></div>
+      <div class="act-row"><span class="act-dot" style="background:var(--h-amber)"></span><span class="act-txt">أمر تشغيل #2214 قرّب من حد الموازنة</span><span class="act-time">قبل 3 س</span></div>
+    </div>
+
+  </div>
+</div>
