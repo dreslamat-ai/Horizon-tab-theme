@@ -32,9 +32,9 @@ app_include_css = [
     "/api/method/horizon_command.api.theme_css",
 ]
 app_include_js = [
-    "/assets/horizon_command/js/horizon_command_rail.js",
+    "/assets/horizon_command/js/horizon_command_tabs.js",
 ]
-# horizon_command_rail.js is the ONLY static JavaScript in this app, and —
+# horizon_command_tabs.js is the ONLY static JavaScript in this app, and —
 # same as horizon_theme's equivalent file — it never reads Frappe-internal
 # data (no workspace list, no boot info, no route state): it only toggles a
 # class on <html>, reads the one CSS custom property the settings endpoint

@@ -42,8 +42,10 @@ def theme_css():
     font_choice = settings.font_family or "Tajawal"
     font_stack, font_url = FONT_STACKS.get(font_choice, FONT_STACKS["Tajawal"])
 
-    collapsed_by_default = "1" if (settings.sidebar_default_state or "").startswith("مقفول") else "0"
     form_pad, form_font = DENSITY.get(settings.form_density or "", DENSITY["مضغوط (Command Center)"])
+    # tab bar overflow behaviour — the sidebar-era width/state settings are
+    # gone entirely (that sidebar no longer exists), replaced by this one
+    shrink_tabs = (settings.tab_overflow or "") == "تصغير التابات"
 
     lines = []
     if font_url:
@@ -59,14 +61,15 @@ def theme_css():
     lines.append(f"  --h-font: {font_stack};")
     radius = settings.control_radius if settings.control_radius is not None else 7
     lines.append(f"  --h-r-sm: {radius}px;")
-    rail_w = max(48, min(120, settings.rail_collapsed_width or 68))
-    rail_open = max(160, min(360, settings.rail_open_width or 232))
-    lines.append(f"  --h-rail-w: {rail_w}px;")
-    lines.append(f"  --h-rail-w-open: {rail_open}px;")
-    lines.append(f"  --h-rail-default-collapsed: {collapsed_by_default};")
     lines.append(f"  --h-form-pad: {form_pad};")
     lines.append(f"  --h-form-font: {form_font};")
     lines.append("}")
+
+    # "shrink tabs" is a second, narrower rule rather than a variable:
+    # tightening padding/font is a set of declarations, not a single value,
+    # so a rule expresses it more directly than three separate custom props
+    if shrink_tabs:
+        lines.append(".h-tab{ padding: 7px 10px 6px !important; font-size: .76rem !important; }")
 
     css = "\n".join(lines)
     return Response(css, mimetype="text/css", headers={"Cache-Control": "no-store"})

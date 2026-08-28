@@ -253,15 +253,20 @@ a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item):hover{
    !important declarations on the same property always resolve by SOURCE
    ORDER, so leaving even one property untouched (color, in an earlier draft
    of this file) lets the chip rule silently win it back. */
-.workspace-sidebar a, [class*="sidebar"][class*="workspace"] a{
-  display: flex !important; border: none !important; background: transparent !important;
-  padding: 0 !important; border-radius: var(--h-r-sm) !important;
+/* Tab-bar links: these ARE <a> elements (relocated from Frappe's own
+   sidebar by horizon_command_tabs.js), so without this they'd get the
+   navy-pill chip treatment and stop looking like tabs entirely. The
+   .h-tab rules further down set the real appearance; this block only
+   cancels the chip rule's !important properties so those can apply. */
+.h-tab-bar a{
+  border: none !important; background: transparent !important;
+  border-radius: 10px 10px 0 0 !important;
+  padding: 9px 16px 8px !important;
   color: var(--h-on-dark-2) !important;
 }
-.workspace-sidebar a:hover, [class*="sidebar"][class*="workspace"] a:hover{
-  color: #fff !important; background: rgba(255,255,255,.08) !important;
-}
-.workspace-sidebar a.selected, [class*="sidebar"][class*="workspace"] a.selected{ color: #fff !important; }
+.h-tab-bar a.active{ background: var(--h-paper) !important; color: var(--h-navy-900) !important; }
+.h-tab-bar a:hover{ color: #fff !important; }
+.h-tab-bar a.active:hover{ color: var(--h-navy-900) !important; }
 .navbar a, .navbar .navbar-nav > li > a{
   display: inline-flex !important; border: none !important; background: transparent !important;
   padding: 8px 10px !important; border-radius: 8px !important;
@@ -609,278 +614,111 @@ html[dir="ltr"]{ --h-panel-from: 100%; }
 }
 :focus-visible{ outline: 2px solid var(--h-navy); outline-offset: 2px; }
 
-/* ── NEW V16 SHELL — text sidebar, open by default ────────────────────────
-   Brought back from the earlier "radical redesign" project (glassmorphism
-   version, verified on demo.horizonerp.cloud) — but reimplemented here as a
-   pure CSS technique instead of the JS-built rail that project used, for the
-   same reason the rest of this file avoids assuming v16 internals: v16's
-   sidebar is still moving upstream (frappe/frappe#27499, #34734, #37646,
-   #38182 — all opened Jan–Mar 2026), so code that reads Frappe's internal
-   workspace list to build a custom rail could silently break on the next
-   point release. (horizon_rail.js — the one JS file this theme ships — adds
-   the open/close button below; it doesn't read any of that internal data
-   either, see the file's own header for why that keeps it safe.)
+/* ── TOP TAB BAR — Chrome-style workspace tabs ────────────────────────────
+   REPLACES the icon-rail sidebar that earlier versions of this app shipped.
+   That sidebar (and its collapse/expand JS, its hierarchy shading, its
+   width settings) is GONE — not disabled, removed — after a prototype
+   review where tabs were chosen over it deliberately.
 
-   STATE MODEL — deliberately the opposite of an earlier draft of this file,
-   worth naming so nobody "fixes" it back by accident: the sidebar's OPEN,
-   full-width, names-visible look is the CSS DEFAULT — no class needed. A
-   `h-sidebar-collapsed` class, added by horizon_rail.js, is what narrows it
-   to the 68px icon-only rail. This way the sidebar is correct on first
-   paint with zero JavaScript having run yet — there's no flash of the wrong
-   state while the toggle script loads. The COLLAPSED state still needs
-   ZERO knowledge of child markup to work: narrow the container and hide
-   overflow. Every nav pattern renders [icon][text] in that order with a
-   fixed-width icon first, so a narrow, overflow-hidden container clips the
-   text and leaves the icon visible — without ever selecting the text node
-   directly. If Frappe already sets a `title` attribute on these links (it
-   does, for accessibility), the browser's native tooltip shows the
-   workspace name on hover in that collapsed state — no JS required for
-   that either.
+   THE TRADE-OFF, stated honestly because it's real and it's the main
+   reason to revisit this later: a sidebar shows every workspace at once
+   vertically; a tab bar shows as many as fit horizontally and scrolls for
+   the rest. Prototyped at 12 workspaces and it still works — but it is
+   measurably less scannable at that count than the sidebar was. Best fit
+   is roughly 5–8 workspaces. If tenants routinely run 12+, the honest
+   answer is to add an overflow dropdown (or reconsider), not to pretend
+   horizontal scrolling is equivalent.
 
-   VERIFY-AFTER-INSTALL NOTE: this targets the sidebar by the same broad
-   selector as the section above, on purpose (see that section's comment).
-   If your instance's actual sidebar wrapper uses a different class, open
-   dev tools, find the real one, and add it to the selector list below —
-   don't guess at nested internals beyond that. The hierarchy-shading block
-   further down carries a SECOND, separate uncertainty of its own — flagged
-   there specifically, since it's a bigger guess than everything else here. */
-:root{ --h-rail-w: 68px; --h-rail-w-open: 232px; }
+   HOW IT GETS ITS LINKS: horizon_command_tabs.js MOVES the workspace links
+   Frappe already renders in its own sidebar into this bar. It's a DOM
+   relocation of existing elements — not a read of frappe.boot, not a
+   rebuild of the workspace list from data. Same safety principle the old
+   rail followed: never depend on internal data shapes that are still
+   settling in v16. If the source container isn't found, the script exits
+   silently and Frappe's own sidebar simply stays as-is — a degraded but
+   working Desk, never a broken one. */
+:root{ --h-tabbar-h: 44px; }
 
-/* base = OPEN. full width, names visible, scrollable if the list is long. */
-.workspace-sidebar, [class*="sidebar"][class*="workspace"]{
-  width: var(--h-rail-w-open) !important;
-  min-width: var(--h-rail-w-open) !important;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding-top: 78px; /* room for the logo tile below */
-  position: relative;
-  background: var(--h-navy-900);
-  border-inline-end: 1px solid rgba(255,255,255,.08);
-  box-shadow: var(--h-shadow-2);
+.h-tab-bar{
+  display: flex; align-items: flex-end; gap: 2px;
+  background: var(--h-navy-950);
+  padding: 8px 12px 0;
+  min-height: var(--h-tabbar-h);
+  overflow-x: auto; overflow-y: hidden;
+  scrollbar-width: none;
 }
-/* logo tile at the top of the rail — a decorated ::before, so it never
-   touches real DOM. Swap the "H" for a background-image once you have the
-   brand-book PNG if you want the exact mark instead of a CSS letter. */
-.workspace-sidebar::before, [class*="sidebar"][class*="workspace"]::before{
-  content: "H";
-  position: absolute;
-  top: 14px; inset-inline-start: 50%;
-  transform: translateX(-50%);
-  width: 40px; height: 40px;
-  border-radius: var(--h-r-sm);
-  background: #fff; color: var(--h-navy);
-  display: flex; align-items: center; justify-content: center;
-  font-weight: 900; font-size: 1.1rem; font-family: var(--h-font);
+.h-tab-bar::-webkit-scrollbar{ display: none; }
+.h-tab-bar .h-brand{
+  display: flex; align-items: center; gap: 8px; padding: 0 12px 8px;
+  color: #fff; font-weight: 900; font-size: .9rem; flex: none;
 }
-html[dir="rtl"] .workspace-sidebar::before,
-html[dir="rtl"] [class*="sidebar"][class*="workspace"]::before{
-  transform: translateX(50%);
+.h-tab-bar .h-brand .mark{
+  width: 22px; height: 22px; border-radius: 6px; background: #fff; color: var(--h-navy);
+  display: grid; place-items: center; font-size: .75rem; font-weight: 900;
 }
-/* links, open/base look: full row, name visible, icon + text side by side */
-.workspace-sidebar a, [class*="sidebar"][class*="workspace"] a{
-  align-items: center; justify-content: flex-start;
-  width: 100%; height: 44px;
-  white-space: nowrap; overflow: hidden;
-  margin-bottom: 2px; padding-inline: 16px !important; gap: 12px;
-  /* border/background/padding-reset/colour for this selector are set in
-     the "links → buttons" exceptions block above — kept there on purpose,
-     since that's also where they have to beat the global chip rule's
-     !important. Splitting layout (here) from colour (there) for the same
-     element is not ideal, but merging them would mean either duplicating
-     the rail's layout up next to the button code (worse for readability)
-     or moving the whole button-exclusion system down here (breaks the
-     "exceptions right next to what they're excepting from" structure).
-     This comment is the pointer between the two halves. */
+.h-tab{
+  display: flex; align-items: center; gap: 7px;
+  padding: 9px 16px 8px;
+  border-radius: 10px 10px 0 0;
+  background: var(--h-navy-700);
+  color: var(--h-on-dark-2);
+  font-size: .82rem; font-weight: 700;
+  cursor: pointer; white-space: nowrap; flex: none;
+  text-decoration: none !important;
+  border: none !important;
+  transition: background .15s, color .15s;
 }
-.workspace-sidebar a.selected, .workspace-sidebar a.active,
-[class*="sidebar"][class*="workspace"] a.selected{
-  background: rgba(143,168,204,.18) !important; /* !important: must beat the
-    exceptions block's own `background: transparent !important` above,
-    which applies to every rail link including this more-specific state */
-  border-inline-start: 2px solid var(--h-steel);
+.h-tab:hover{ background: var(--h-navy-500); color: #fff; }
+/* the active tab is the same colour as the content area below it, with no
+   bottom border — so it reads as physically continuous with the page,
+   which is the whole visual trick that makes it look like a browser tab */
+.h-tab.active{
+  background: var(--h-paper) !important;
+  color: var(--h-navy-900) !important;
+  font-weight: 800;
 }
-.workspace-sidebar .sec, .workspace-sidebar [class*="section-title"],
-[class*="sidebar"][class*="workspace"] [class*="section-title"]{
-  display: block; padding: 16px 16px 6px; font-size: .7rem; font-weight: 800;
-  letter-spacing: .05em; text-transform: uppercase; color: var(--h-on-dark-3) !important;
+.h-tab .h-tab-ic{ width: 15px; height: 15px; flex: none; opacity: .85; }
+.h-tab.active .h-tab-ic{ opacity: 1; color: var(--h-navy); }
+
+/* Frappe's own sidebar is hidden once its links have been relocated.
+   GATED on `html.h-tabs-ready`, which horizon_command_tabs.js only adds
+   AFTER it has successfully built the tab bar. This ordering is load-
+   bearing: if the script fails to find the sidebar (v16 renamed it, JS
+   blocked, whatever), the class is never added, this rule never applies,
+   and Frappe's stock sidebar stays visible and usable. Ungating this rule
+   would turn any script failure into a Desk with no navigation at all.
+   Hidden rather than removed from the DOM: the script moves LINKS out, and
+   leaving the emptied container in place means anything else Frappe
+   attaches to it later doesn't hit a missing node. */
+/* .body-sidebar-container أُضيفت هنا (مقاسة فعليًا v16.31 على هذا
+   البنش، horizon_command_rail.js القديم) — بلاها الحاوية بتفضل شريط
+   كحلي فاضي بعد نقل الروابط، مش بتختفي، رغم إن الروابط نفسها اتنقلت */
+html.h-tabs-ready .body-sidebar-container,
+html.h-tabs-ready .workspace-sidebar,
+html.h-tabs-ready [class*="sidebar"][class*="workspace"]{
+  display: none !important;
 }
 
-/* ── rail — COLLAPSED state ────────────────────────────────────────────
-   Toggled by horizon_rail.js adding `h-sidebar-collapsed` on <html> — on
-   outside-click, on clicking a link inside the rail, or by hand via the
-   toggle button. Narrows the container back down and re-clips the text,
-   the exact inverse of the base rules above. */
-html.h-sidebar-collapsed .workspace-sidebar,
-html.h-sidebar-collapsed [class*="sidebar"][class*="workspace"]{
-  width: var(--h-rail-w) !important;
-  min-width: var(--h-rail-w) !important;
-  overflow: hidden;
-  box-shadow: none;
-}
-html.h-sidebar-collapsed .workspace-sidebar a,
-html.h-sidebar-collapsed [class*="sidebar"][class*="workspace"] a{
-  width: var(--h-rail-w) !important;
-  justify-content: center !important;
-  padding-inline: 0 !important;
-}
-html.h-sidebar-collapsed .workspace-sidebar .sec,
-html.h-sidebar-collapsed .workspace-sidebar [class*="section-title"],
-html.h-sidebar-collapsed [class*="sidebar"][class*="workspace"] [class*="section-title"]{
-  display: none; /* pure text with no icon — clipping it would leave a blank row */
-}
-/* collapsed rail: hierarchy shading doesn't apply — nested items aren't
-   visible at all at 68px, so reset the depth padding/tint back to flat.
-   (The hierarchy rules themselves live further down, scoped to the base/
-   open state only, so this reset only matters if a future edit removes
-   that scoping — kept here as a guard, cheap insurance either way.) */
-html.h-sidebar-collapsed .workspace-sidebar li li a,
-html.h-sidebar-collapsed [class*="sidebar"][class*="workspace"] li li a{
-  padding-inline-start: 0 !important;
-  background: transparent !important;
-}
-
-/* the toggle button — one real element injected once by horizon_rail.js,
-   pinned to the rail's outer edge in both states (logical `inset-inline-end`
-   so it lands correctly whether the page is RTL or LTR without a separate
-   rule). Rendered as a navy circle so it reads as a control, not a link —
-   deliberately NOT run through the "links → buttons" chip treatment above
-   even though it's technically a <button>, since that rule only ever
-   touched <a> elements to begin with. */
-.h-rail-toggle{
-  position: absolute;
-  top: 78px; /* sits just under the logo tile */
-  inset-inline-end: -13px;
-  width: 26px; height: 26px;
-  border-radius: 50%;
-  background: var(--h-navy);
-  border: 2px solid var(--h-navy-950);
-  color: #fff;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  z-index: 20;
-  box-shadow: var(--h-shadow-1);
-  transition: background .18s, transform .25s;
-}
-.h-rail-toggle:hover{ background: var(--h-navy-700); }
-.h-rail-toggle svg{ transition: transform .25s; }
-/* arrow points "close" (inward) when open — the default — and flips to
-   point "open" (outward) once collapsed, so it always previews what
-   clicking it will do next rather than what state you're currently in. */
-html.h-sidebar-collapsed .h-rail-toggle svg{ transform: rotate(180deg); }
-
-/* ── hierarchy shading — parent/child depth, in navy shades ──────────────
-   Scoped to the OPEN/base state only — collapsed shows icons alone, so
-   depth has nothing to attach to there (see the reset above).
-   THIS BLOCK CARRIES MORE UNCERTAINTY than the rest of the file and is
-   flagged as such deliberately, not silently shipped as if verified: it's
-   the one place this theme has to guess at NESTED markup, not just an
-   outer wrapper. Two techniques are stacked so whichever matches your
-   actual v16 instance takes effect — check dev tools after installing and
-   delete whichever block does nothing on your instance:
-     (a) STRUCTURAL depth — assumes children render as nested <li>/<ul>,
-         the conventional way to build any tree/nested-list UI. If true,
-         no class names need to match at all, at any depth.
-     (b) EXPLICIT depth markers — assumes Frappe instead flags depth with
-         something like `data-level="1"` or a `level-1` class on a flat
-         list (plausible for v16's rebuilt sidebar). The `[class*="level-N"]`
-         / `[data-level="N"]` selectors below cover that case.
-   Depth reads as "receding into the rail" rather than "more important":
-   each level down gets a touch more steel tint and a touch less weight,
-   the opposite direction from how the selected-state highlight (above)
-   uses steel — that one marks "current", these mark "nested". */
-html:not(.h-sidebar-collapsed) .workspace-sidebar li li a,
-html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] li li a,
-html:not(.h-sidebar-collapsed) [class*="level-1"] > a,
-html:not(.h-sidebar-collapsed) [data-level="1"] > a{
-  padding-inline-start: 30px !important;
-  background: rgba(143,168,204,.07) !important;
-  font-weight: 700;
-  font-size: .93em;
-}
-html:not(.h-sidebar-collapsed) .workspace-sidebar li li li a,
-html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] li li li a,
-html:not(.h-sidebar-collapsed) [class*="level-2"] > a,
-html:not(.h-sidebar-collapsed) [data-level="2"] > a{
-  padding-inline-start: 44px !important;
-  background: rgba(143,168,204,.12) !important;
-  font-weight: 500;
-  font-size: .89em;
-}
-html:not(.h-sidebar-collapsed) .workspace-sidebar li li li li a,
-html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] li li li li a,
-html:not(.h-sidebar-collapsed) [class*="level-3"] > a,
-html:not(.h-sidebar-collapsed) [data-level="3"] > a{
-  padding-inline-start: 58px !important;
-  background: rgba(143,168,204,.17) !important;
-  font-weight: 500;
-  font-size: .86em;
-}
 
 /* ── mobile ────────────────────────────────────────────────────────────
    768px matches Frappe's own Bootstrap-based breakpoint (md), so this lines
    up with where Frappe's native layout already starts adapting, rather than
    picking an arbitrary number of my own.
 
-   The sidebar's desktop default is OPEN — deliberately, per the earlier
-   decision above. On a phone that same default would hand over 60%+ of the
-   viewport to the sidebar before the person has even done anything, so
-   mobile gets the opposite default: START narrow, and let the toggle turn
-   it into a temporary FULL-HEIGHT OVERLAY (position:fixed) rather than an
-   inline flex sibling — an inline expand would still squeeze the content
-   column to almost nothing on a narrow screen. Collapsing it back returns
-   it to the normal, non-overlay, narrow-rail flow — no compensating margin
-   needed anywhere else, because in that state it behaves exactly like the
-   desktop *collapsed* rail always has. */
+   With the sidebar gone, mobile's job is simpler than it was: there's no
+   drawer to manage, just a tab bar that needs to stay usable when there
+   isn't room for every tab. It already scrolls horizontally by default —
+   these rules only tighten the spacing so more tabs fit before scrolling
+   becomes necessary, which matters more on a phone than on a desktop. */
 @media (max-width: 768px){
-  .workspace-sidebar, [class*="sidebar"][class*="workspace"]{
-    width: var(--h-rail-w) !important;
-    min-width: var(--h-rail-w) !important;
-    overflow: hidden;
-  }
-  .workspace-sidebar a, [class*="sidebar"][class*="workspace"] a{
-    width: var(--h-rail-w) !important;
-    justify-content: center !important;
-    padding-inline: 0 !important;
-  }
-  .workspace-sidebar .sec, .workspace-sidebar [class*="section-title"],
-  [class*="sidebar"][class*="workspace"] [class*="section-title"]{
-    display: none;
-  }
-  /* hierarchy shading has nothing to attach to at icon-only width */
-  .workspace-sidebar li li a, [class*="sidebar"][class*="workspace"] li li a{
-    padding-inline-start: 0 !important; background: transparent !important;
-  }
-
-  /* the OPEN state on mobile = a temporary overlay drawer, not a squeeze */
-  html:not(.h-sidebar-collapsed) .workspace-sidebar,
-  html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"]{
-    position: fixed !important;
-    inset-block: 0;
-    inset-inline-start: 0;
-    width: min(78vw, 280px) !important;
-    min-width: min(78vw, 280px) !important;
-    overflow-y: auto; overflow-x: hidden;
-    z-index: 90;
-    box-shadow: 0 0 0 2000px rgba(16,23,38,.55), var(--h-shadow-2);
-    /* the oversized spread shadow doubles as a dim backdrop over the
-       content behind it, without needing a second DOM element for one —
-       a real backdrop div would need its own click-to-dismiss wiring,
-       which duplicates logic horizon_rail.js already has for "tap outside
-       the sidebar" */
-  }
-  html:not(.h-sidebar-collapsed) .workspace-sidebar a,
-  html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] a{
-    width: 100% !important; justify-content: flex-start !important;
-    padding-inline: 16px !important;
-  }
-  html:not(.h-sidebar-collapsed) .workspace-sidebar .sec,
-  html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] [class*="section-title"]{
-    display: block;
-  }
-  html:not(.h-sidebar-collapsed) .workspace-sidebar li li a,
-  html:not(.h-sidebar-collapsed) [class*="sidebar"][class*="workspace"] li li a{
-    padding-inline-start: 30px !important; background: rgba(143,168,204,.07) !important;
-  }
+  .h-tab-bar{ padding: 6px 8px 0; }
+  .h-tab{ padding: 8px 12px 7px; font-size: .78rem; }
+  .h-tab-bar .h-brand{ padding: 0 8px 7px; font-size: .82rem; }
+  /* the workspace name is what makes a tab identifiable, so it stays —
+     unlike the old collapsed rail, this does NOT drop to icons-only:
+     an icon-only tab bar reads as a toolbar, not as navigation, and the
+     horizontal scroll already solves the space problem without that
+     ambiguity */
 
   /* the navbar search box is the other fixed-width element that overflows
      a phone screen first — let it shrink instead of forcing a scrollbar */
@@ -1061,116 +899,4 @@ html:not(.h-sidebar-collapsed) [data-level="3"] > a{
   .dash-canvas{ background: var(--h-canvas) !important; }
   .bento-card{ background-color:#fff !important; }
   .bento-ai{ background: linear-gradient(155deg, var(--h-navy-700), var(--h-navy-950)) !important; }
-}
-
-/* ════════════════════════════════════════════════════════════════════════
-   v16.31 SHELL COMPATIBILITY — مقيسة على DOM الفعلي لهذا البنش (٢٦ أغسطس):
-   السايدبار في v16.31 هو .body-sidebar-container > .body-sidebar —
-   عائلة .workspace-sidebar الأصلية فوق لا تطابقه إطلاقًا فكان الرايل
-   كله ميتًا (مقيس بمتصفح حقيقي: querySelector رجّع null). الطبقة دي
-   إضافة في آخر الملف عمدًا — الأصل محفوظ كما سُلّم، والتكرار هنا مقصود
-   عشان أي رجوع لـDOM القديم يفضل شغالًا برضه.
-   ════════════════════════════════════════════════════════════════════ */
-.body-sidebar-container{
-  background: var(--h-navy) !important;
-  width: var(--h-rail-w-open) !important;
-  min-width: var(--h-rail-w-open) !important;
-  transition: width .18s ease, min-width .18s ease;
-  overflow: hidden;
-}
-/* الابنة .body-sidebar بترسم خلفية فاتحة خاصة بها فوق الحاوية وبتغطيها
-   بالكامل (مقيس على theme.horizonerp: الحاوية rgb(29,45,68) والابنة
-   rgb(248,248,248) فوقها — نفس العطب اتقاس واتصلح في horizon_theme) */
-.body-sidebar-container .body-sidebar{ background: transparent !important; }
-html.h-sidebar-collapsed .body-sidebar-container{
-  width: var(--h-rail-w) !important;
-  min-width: var(--h-rail-w) !important;
-}
-html.h-sidebar-collapsed .body-sidebar-container .sidebar-item-label{ display: none !important; }
-/* استثناء قاعدة الشيبس العامة لروابط السايدبار الجديد — نفس منطق استثناء
-   العائلة القديمة حرفيًا: كل خاصية !important في قاعدة الشيبس تتصفّر هنا */
-/* الخصوصية (0,5,1) عمدًا — قاعدة الشيبس العامة (0,4,1) بأربع :not،
-   والاستثناء لازم يغلبها بالخصوصية لا بترتيب المصدر (كلاهما !important) */
-.body-sidebar-container a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item){
-  display: flex !important; border: none !important; background: transparent !important;
-  padding: 6px 10px !important; border-radius: 8px !important;
-  color: #fff !important; box-shadow: none !important;
-}
-.body-sidebar-container a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item):hover{ background: rgba(255,255,255,.14) !important; color: #fff !important; box-shadow: none !important; }
-.body-sidebar-container .sidebar-item-label{ color: #fff !important; }
-.body-sidebar-container .sidebar-item-icon svg{ stroke: #fff !important; }
-
-/* ════════════════════════════════════════════════════════════════════════
-   v16.31 — الميزتان الجديدتان على DOM هذا البنش الفعلي (مقيس ٢٦ أغسطس):
-
-   ١) محرر الصف: `.grid-row-open-form` القديم غير موجود إطلاقًا في v16.31 —
-      المحرر بقى `.form-in-grid` داخل `.grid-row-open`، وهو fixed أصلًا
-      كمودال متوسّط (900px، z-index 1021) بخلفية `.modal-backdrop.grid-form`.
-      قياس playwright: querySelector('.grid-row-open-form') = null والبنية
-      الحقيقية اتطبعت سلسلة آباء كاملة. كتلة الأصل فوق محفوظة كما سُلّمت
-      (لو Frappe رجع للـDOM القديم تشتغل)، ودي الطبقة المقابلة للجديد.
-
-   ٢) الرئيسية: مفيش [class*="widget-box"] ولا [class*="shortcut"][class*=
-      "widget"] في القشرة الجديدة — لا في /desk ولا جوه صفحات الـworkspace
-      (مقيس: صفر تطابق في الاتنين). كروت الرئيسية الحقيقية هي
-      `.icons-container .desktop-icon`. سيلكتورات الأصل السطحية باقية فوق
-      (بتشتغل لو الكلاسات رجعت)، ودول المقيسون هنا.
-   ════════════════════════════════════════════════════════════════════ */
-
-/* ── ١) محرر الصف المنزلق — على بنية v16.31 الحقيقية */
-.grid-row-open .form-in-grid{
-  top: 0 !important; bottom: 0 !important;
-  inset-inline-end: 0 !important;
-  inset-inline-start: auto !important;
-  left: auto; right: auto;
-  width: min(92vw, 480px) !important;
-  max-width: none !important;
-  height: 100vh !important;
-  margin: 0 !important;
-  background: #fff;
-  box-shadow: -8px 0 32px -12px rgba(16,26,43,.35);
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-  /* القشرة بتوسّط المحرر بـtransform: translateX(240px) (مقيس matrix
-     e=240) — يتصفّر بـ!important، والانزلاق على خاصية translate المستقلة
-     لأن keyframes ماتقدرش تغلب إعلان !important على transform نفسه */
-  transform: none !important;
-  animation: slideInPanelV2 .28s var(--h-spring, cubic-bezier(.22,1,.36,1));
-  border-radius: 0 !important;
-  border-inline-start: 1px solid var(--h-line);
-}
-@keyframes slideInPanelV2{
-  from{ translate: var(--h-panel-from, 100%) 0; opacity: .6; }
-  to{ translate: 0 0; opacity: 1; }
-}
-/* العنوان (صف التحرير #ن وأزرار الإدراج/الحذف) ثابت فوق والجسم بيسكرول */
-.grid-row-open .form-in-grid .grid-form-heading{
-  position: sticky; top: 0; background: #fff; z-index: 2;
-  border-bottom: 1px solid var(--h-line); padding: 12px 16px;
-  font-weight: 900; color: var(--h-navy-900);
-}
-.grid-row-open .form-in-grid .grid-form-body{ padding: 14px 16px; flex: 1; }
-.grid-row-open .form-in-grid .form-column{ padding-inline: 0; }
-/* الخلفية المعتمة بتاعة v16.31 نفسه — نخففها لإحساس اللوحة الجانبية */
-.modal-backdrop.grid-form{ opacity: .25 !important; }
-@media (max-width: 640px){
-  .grid-row-open .form-in-grid{ width: 100vw !important; }
-}
-
-/* ── ٢) كروت الرئيسية — البنية المقيسة فعليًا في v16.31:
-   a.desktop-icon (دايرة بيضا 127px radius:999) > .icon-container (مربع
-   الأيقونة 54px radius:16) + .icon-caption. الدايرة تصميم القشرة الأصلي —
-   ما نفرضش عليها radius مربع؛ الرفعة والظل بيتبعوا الاستدارة تلقائيًا.
-   مسكوب على .desktop-container (الرئيسية) عشان درج التطبيقات الجانبي
-   اللي بيشارك نفس كلاس .desktop-icon ما يتحركش */
-.desktop-container .desktop-icon{
-  transition: transform .2s var(--h-spring, ease), box-shadow .2s !important;
-}
-.desktop-container .desktop-icon:hover{
-  transform: translateY(-3px);
-  box-shadow: var(--h-shadow-1) !important;
-}
-.desktop-container .desktop-icon:hover .icon-container{
-  background: var(--h-navy-050, #eef2f7) !important;
 }
