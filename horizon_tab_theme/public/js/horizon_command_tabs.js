@@ -56,7 +56,8 @@
 
     var brand = document.createElement("div");
     brand.className = "h-brand";
-    brand.innerHTML = '<span class="mark">H</span><span>Horizon</span>';
+    brand.innerHTML =
+      '<span class="mark"><img src="/assets/horizon_tab_theme/images/horizon-mark.png" alt="Horizon"></span><span>Horizon</span>';
     bar.appendChild(brand);
 
     var here = window.location.pathname;
