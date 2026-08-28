@@ -232,8 +232,15 @@ a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item){
   align-items: center;
   gap: 6px;
   padding: 5px 13px !important;
+  /* margin is what keeps adjacent link-buttons from touching. من غيره
+     زرارين جنب بعض بيبانوا لاصقين تمامًا زي زرار واحد مقسّم مش زرارين
+     منفصلين. الرأسي أقل من الأفقي لأن اللي بيلف على سطر جديد محتاج
+     تباعد أقل من اللي جنب بعضه أفقيًا عشان يفضل واضح إنهم منفصلين */
+  margin: 3px 4px !important;
   border: 1.5px solid var(--h-navy) !important;
-  border-radius: 999px !important;
+  /* استدارة أقل من 999px الدائرية القديمة — دلوقتي بتتبع --h-r-sm زي
+     أي زرار تاني، فبتبان "زرار" مش "وسم/tag" */
+  border-radius: var(--h-r-sm) !important;
   color: var(--h-navy) !important;
   background: #fff !important;
   font-weight: 700;
@@ -241,6 +248,18 @@ a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item){
   text-decoration: none !important;
   line-height: 1.5;
   transition: background .18s, color .18s, box-shadow .18s;
+}
+/* تصفير الهامش للمجموعات المستثناة تحت — دي عناصرها متحكَّم في تخطيطها
+   من حاويتها هي (شريط التابات، الليست، النص العادي)، فهامش موروث من
+   القاعدة العامة هيزحزحها عن محاذاتها. .wcard-link وsearch-res مش
+   مقاسين على DOM حقيقي في هذا البنش (مفيش وركسبيس/بحث فرابي بالاسمين
+   دول عندنا وقت الفحص) — مضافين هنا لمطابقة المرجع ولأنهم بلا أي ضرر
+   لو ماوجدوش، مش لأنهم اتأكدوا. */
+.h-tab-bar a, .navbar a, .list-row a, .list-row-col a,
+.comment-content a, .timeline-content a, .frappe-timeline a,
+.ql-editor a, .markdown-preview a, .text-editor a,
+.wcard-link, .search-res{
+  margin: 0 !important;
 }
 a:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item):hover{
   background: var(--h-navy) !important;
