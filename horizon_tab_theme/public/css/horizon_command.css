@@ -766,8 +766,18 @@ body.h-ws-page .page-head{ display: none !important; }
   color: var(--h-navy-900) !important;
   font-weight: 800;
 }
-.h-tab .h-tab-ic{ width: 15px; height: 15px; flex: none; opacity: .85; }
-.h-tab.active .h-tab-ic{ opacity: 1; color: var(--h-navy); }
+/* بلاغ لقطة حقيقي (٣٠ أغسطس): "الأيقونة مش ظاهرة غير في التاب النشط".
+   القياس كشف إن الظن الأول (لون النص العادي `color`) غلط تمامًا —
+   أيقونات فرابي دي (`.icon path`) بترسم بـ`stroke: var(--icon-stroke)`،
+   متغيّر مخصَّص منفصل تمامًا عن `color`، وقيمته الافتراضية جذريًا
+   `--gray-800` (رمادي غامق تقريبًا #383838) **بلا أي علاقة بالسياق**.
+   على التاب النشط (خلفية بيضا) الرمادي الغامق ده متباين وواضح صدفةً؛
+   على باقي التابات (خلفية كحلي غامقة) نفس اللون **بالظبط** بيبقى شبه
+   مختفٍ — مش أيقونة مكسورة، بس لون ثابت مالوش علاقة بالخلفية. تعديل
+   `color` (زي ما جرّبت أول مرة) ملهوش أي أثر لأن الأيقونة أصلاً مش
+   بتقرا `color` — لازم `--icon-stroke` نفسه. */
+.h-tab .h-tab-ic{ width: 16px; height: 16px; flex: none; --icon-stroke: var(--h-on-dark); }
+.h-tab.active .h-tab-ic{ --icon-stroke: var(--h-navy); }
 
 /* Frappe's own sidebar is hidden once its links have been relocated.
    GATED on `html.h-tabs-ready`, which horizon_command_tabs.js only adds
