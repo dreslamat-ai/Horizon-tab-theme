@@ -33,17 +33,41 @@
     return all.filter(function (w) { return !w.parent_page && !w.is_hidden; });
   }
 
-  function isActive(w) {
+  /* بلاغ المالك (لقطة شاشة، ٢٩ أغسطس): فتح "الصنف" (List View داخل
+     Workspace المخازن) وما كانش تاب "المخازن" بيتحدد نشط ولا الشريط
+     بيتحرّك ليوريه — القياس القديم كان بيقارن route[0]==="Workspaces"
+     بس، فأي مسار تاني (List/Form/Report) ما كانش بيتطابق مع أي تاب
+     إطلاقًا مهما كان منطقيًّا تابع لأنهي Workspace.
+
+     الحل: فرابي نفسه بيحل نفس المسألة لفتة الخبز (breadcrumbs.js
+     set_workspace_breadcrumb) وبيرسم رابط .worksapce-breadcrumb بمسار
+     الـWorkspace الصحيح — بما إن روابطنا كلها /desk/<slug> أصلاً (نفس
+     تعديل الرابط السابق)، المطابقة تبقى بالـhref مباشرة بلا ما نعيد
+     بناء جدول doctype→workspace من عندنا. */
+  function currentWorkspaceHref() {
     var route = (window.frappe && frappe.get_route && frappe.get_route()) || [];
-    return route[0] === "Workspaces" && route[1] === w.name;
+    if (route[0] === "Workspaces" && route[1]) {
+      return "/desk/" + frappe.router.slug(route[1]);
+    }
+    var crumb = document.querySelector(".navbar-breadcrumbs a.worksapce-breadcrumb");
+    return crumb ? crumb.getAttribute("href") : null;
   }
 
+  /* والتاب النشط لازم يبقى مرئي فعليًا لا نشطًا بالاسم بس — لو كان خارج
+     نطاق الشريط المرئي (شريط طويل بيسكرول أفقيًّا) المستخدم ميعرفش
+     أصلاً إنه محدد. scrollIntoView بـ"nearest" بيحرّكه لحافة الشريط
+     المرئي بالظبط لو كان مقصوص، وما يعملش حاجة لو أصلاً ظاهر. */
   function updateActive(bar) {
+    var href = currentWorkspaceHref();
+    var matched = null;
     var tabs = bar.querySelectorAll(".h-tab");
     for (var i = 0; i < tabs.length; i++) {
-      var match = tabs[i].dataset.wsName ===
-        ((window.frappe && frappe.get_route && frappe.get_route()[1]) || "");
-      tabs[i].classList.toggle("active", match);
+      var isMatch = !!href && tabs[i].getAttribute("href") === href;
+      tabs[i].classList.toggle("active", isMatch);
+      if (isMatch) matched = tabs[i];
+    }
+    if (matched) {
+      matched.scrollIntoView({ inline: "nearest", block: "nearest", behavior: "smooth" });
     }
   }
 
@@ -112,7 +136,6 @@
       // /desk/ في كل مرة. الربط هنا بقى /desk/ يطابق الأصل، بلا قفزة تحويل.
       a.href = "/desk/" + frappe.router.slug(w.name);
       a.dataset.wsName = w.name;
-      if (isActive(w)) a.classList.add("active");
 
       var iconHtml = "";
       try { iconHtml = frappe.utils.icon(w.icon || "folder-normal", "sm"); } catch (e) { /* لا أيقونة أهون من كسر الشريط */ }
@@ -140,7 +163,27 @@
         setTimeout(relocateWorkspaceSearch, 0);
       });
     }
+
+    // فتات الخبز (.worksapce-breadcrumb) بترسم متأخرة عن تغيير المسار
+    // في صفحات القوائم (بعد ما فرابي يجيب meta الدوكتايب) — مراقب DOM
+    // بيمسك اللحظة اللي ترسم فيها فعليًا بدل تخمين مهلة ثابتة، ومربوط
+    // بإطار رسم واحد (requestAnimationFrame) عشان مايتكررش مع كل
+    // تغيير صغير في الصفحة المزدحمة أصلاً بتغييرات فرابي الداخلية
+    var activeUpdateScheduled = false;
+    function scheduleActiveUpdate() {
+      if (activeUpdateScheduled) return;
+      activeUpdateScheduled = true;
+      requestAnimationFrame(function () {
+        activeUpdateScheduled = false;
+        updateActive(bar);
+      });
+    }
+    new MutationObserver(scheduleActiveUpdate).observe(document.body, {
+      childList: true, subtree: true,
+    });
+
     relocateWorkspaceSearch();
+    updateActive(bar);
     return true;
   }
 
