@@ -120,11 +120,49 @@
     var bar = document.createElement("nav");
     bar.className = "h-tab-bar";
 
-    var brand = document.createElement("div");
+    // بلاغ المالك (٣٠ أغسطس): "عاوز اضغط عالشعار يفتح الرئيسية" — كان
+    // <div> بلا أي حدث. ولاحظ كمان إن أيقونة البيت الأصلية بتاعة فرابي
+    // في فتات الخبز (`.navbar-breadcrumbs a[href="/desk"]`) بترجع
+    // بلا أي تنقّل فعلي — مقاس حيًّا: الضغط عليها فضل في نفس المسار.
+    // الحل هنا: الشعار وأي أيقونة بيت تانية في الصفحة يتوحّدوا على نفس
+    // السلوك الموثوق (frappe.set_route لتاب "Home") بدل الاعتماد على
+    // معالج فرابي الأصلي غير المضمون هنا.
+    var homeWs = workspaces.filter(function (w) { return w.name === "Home"; })[0] || workspaces[0];
+    var homeSlug = frappe.router.slug(homeWs.name);
+
+    function goHome(e) {
+      if (e) {
+        e.preventDefault();
+        // بلاغ لقطة حقيقي (٣٠ أغسطس): معالج فرابي الأصلي على نفس رابط
+        // فتات الخبز بيتنفّذ برضه ويكسب السباق (بيرجّع المسار لـ/desk
+        // الخام بعد نداء set_route هنا مباشرة) — الاتنين capture على
+        // document فمين يفوز يعتمد على ترتيب تسجيل مش مضمون بين تطبيقين.
+        // stopImmediatePropagation بيقفل الطريق نهائيًا قدام أي معالج
+        // تاني (التقاط أو فقاعة) على نفس الحدث، فمفيش سباق أصلًا.
+        e.stopImmediatePropagation();
+      }
+      frappe.set_route(homeSlug);
+    }
+
+    var brand = document.createElement("a");
     brand.className = "h-brand";
+    brand.href = "/desk/" + homeSlug;
     brand.innerHTML =
       '<span class="mark"><img src="/assets/horizon_tab_theme/images/horizon-mark.png" alt="Horizon"></span><span>Horizon</span>';
+    brand.addEventListener("click", goHome);
     bar.appendChild(brand);
+
+    // أي أيقونة بيت تانية في الصفحة (فتات الخبز الأصلية بتاعة فرابي
+    // تحديدًا) تتوحّد على نفس السلوك — بلا الاعتماد على معالجها
+    // الأصلي غير الموثوق هنا (مقاس حيًّا: الضغط عليها كان بيرجع بلا أي
+    // تنقّل). مربوط على مرحلة الالتقاط (capture=true) لا الفقاعة —
+    // معالج فرابي الأصلي على نفس الرابط بيستدعي stopPropagation على ما
+    // يبدو، فمستمع على document بالفقاعة العادية ما كانش بيوصله الحدث
+    // أصلًا. الالتقاط بيسبق أي stopPropagation في مرحلة الفقاعة.
+    document.addEventListener("click", function (e) {
+      var link = e.target.closest && e.target.closest(".navbar-breadcrumbs a[href=\"/desk\"]");
+      if (link) goHome(e);
+    }, true);
 
     workspaces.forEach(function (w) {
       var a = document.createElement("a");
