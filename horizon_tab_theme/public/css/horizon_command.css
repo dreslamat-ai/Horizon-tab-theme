@@ -329,6 +329,19 @@ a:where(:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item)):hover{
   font-weight: 700; text-decoration: underline !important;
 }
 
+/* بلاغ لقطة حقيقي (٣٠ أغسطس): عنوان الصفحة نفسه (`a.title-text` — اسم
+   الـDocType الجمع، مثلًا "نوع المستند" فوق قائمة DocType) عنصر `<a>`
+   فبيتحوّل زرار كحلي محدود زي أي رابط تاني — فيبان صندوق/شريحة بدل ما
+   يبان عنوان صفحة بارز. فرابي نفسه ماحاطش أي حدود/خلفية عليه أصلًا
+   (نص عادي غامق الحجم بس) — نفس منطق روابط الليست فوق (list-row a):
+   عنصر بنيوي (عنوان لا رابط تصفّح) لازم يفضل نص، مش شريحة. */
+a.title-text{
+  display: inline !important; border: none !important; background: transparent !important;
+  padding: 0 !important; margin: 0 !important; border-radius: 0 !important;
+  color: var(--h-navy-900) !important; font-weight: 700; text-decoration: none !important;
+}
+a.title-text:hover{ background: transparent !important; color: var(--h-navy-900) !important; text-decoration: none !important; }
+
 /* ── status indicators (dots + pills) — the workflow palette ─────────────
    Frappe's own indicator colour classes (.orange/.green/.red/...) are the
    stable public hook here; we remap them rather than hunting for doctype-
