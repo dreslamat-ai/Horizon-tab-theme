@@ -276,6 +276,20 @@ a:where(:not(.btn):not(.navbar-brand):not(.app-logo):not(.dropdown-item)):hover{
   box-shadow: var(--h-shadow-1);
 }
 
+/* بلاغ لقطة حقيقي (٣٠ أغسطس): أول عنصر في فتات الخبز أيقونة بيت بس
+   (رابط `/desk` بلا نص — عُرف فرابي الثابت لجذر فتات الخبز)، وحاويته
+   `.title-area.ellipsis` ضيقة جدًا وoverflow:hidden (مصمَّمة أصلًا
+   لقصّ نصوص طويلة بـ"..."). القاعدة العامة فوق بتحطّ padding:5px 13px
+   على كل رابط بلا استثناء، فبتطلّع الأيقونة الـ16px في زرار 44px عريض
+   يتخطى عرض الحاوية الضيقة — والنتيجة حافة الزرار الشمال (والاستدارة
+   معاها) بتتقصّ بصريًا، شكل "زرار متكسّر" مش زرار سليم بعرض غلط.
+   الحل: حشو أقل لأول عنصر في فتات الخبز تحديدًا (أيقونة بس، مش نص)
+   بدل إلغاء شكل الشريحة كله على باقي فتات الخبز (اللي بيحتاجه فعلاً). */
+.navbar-breadcrumbs li:first-child a{
+  padding: 4px !important;
+  margin: 3px 2px !important;
+}
+
 /* exceptions — see the rationale above for each group. Every property the
    chip rule sets with !important must be explicitly reset here too — two
    !important declarations on the same property always resolve by SOURCE
