@@ -105,7 +105,12 @@
     workspaces.forEach(function (w) {
       var a = document.createElement("a");
       a.className = "h-tab";
-      a.href = "/app/" + frappe.router.slug(w.name);
+      // بلاغ المالك (لقطة شاشة، ٢٩ أغسطس): تمرير الماوس فوق تاب بيوَرّي
+      // /app/<slug> بينما عنوان الصفحة الفعلي بعد التحميل /desk/<slug> —
+      // فرابي نفسه بيولّد روابطه (زي فتات الخبز worksapce-breadcrumb)
+      // بـ/desk/ مباشرة؛ /app/ نسخة قديمة لسه شغالة بس بتحوّل (301) لـ
+      // /desk/ في كل مرة. الربط هنا بقى /desk/ يطابق الأصل، بلا قفزة تحويل.
+      a.href = "/desk/" + frappe.router.slug(w.name);
       a.dataset.wsName = w.name;
       if (isActive(w)) a.classList.add("active");
 
