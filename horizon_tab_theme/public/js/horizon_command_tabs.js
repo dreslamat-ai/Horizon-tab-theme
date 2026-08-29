@@ -47,6 +47,46 @@
     }
   }
 
+  /* بلاغ المالك (٢٩ أغسطس، لقطة حقيقية): على صفحة Workspace نفسها شريط
+     فرابي القياسي (بحث + اسم الـWorkspace بقائمة منسدلة + زرار فتح
+     السايدبار) بيظهر مباشرة تحت شريط التابات — وهو تكرار تام لنفس
+     المعلومة اللي شريط التابات بيعرضها أصلاً (اسم الـWorkspace الحالي +
+     التنقّل بينه وبين الباقي). طلب المالك: يتخفي وأزراره (تحديدًا
+     البحث، الوحيد اللي بينفّذ فعل حقيقي هنا) تتنقل لشريط التابات.
+
+     مقصور على مسار Workspaces تحديدًا: صفحات القوائم والنماذج فيها نفس
+     الشريط لكن بأزرار حقيقية («جديد»، الفلاتر) — مُتحقَّق فعليًا إن
+     .page-actions فاضي من أي زرار مرئي على صفحة Workspace بس (كل
+     الأزرار فيها class="hide"، بتظهر بس في وضع تحرير لوحة الإدمن).
+
+     النقل فعليّ (moveNode) لا استنساخ — الحدث اللي بيفتح مربع البحث
+     مربوط بـfrappe.search.AwesomeBar().setup(selector) وقت إنشاء
+     العنصر، وربط jQuery بيفضل شغّال على العقدة نفسها بعد نقلها في
+     الـDOM (بيتقطع بس لو العقدة اتشالت وأُعيد إنشاؤها). وبما إن فرابي
+     بيعيد بناء .page-head مع كل تنقّل Workspace، النقل بيتكرر مع كل
+     تغيير مسار عبر frappe.router.on('change'). */
+  function relocateWorkspaceSearch() {
+    var route = (window.frappe && frappe.get_route && frappe.get_route()) || [];
+    var isWorkspace = route[0] === "Workspaces";
+    document.body.classList.toggle("h-ws-page", isWorkspace);
+    if (!isWorkspace) return;
+
+    var search = document.querySelector(".page-head .navbar-modal-search-mobile");
+    if (!search) return;
+
+    var bar = document.querySelector(".h-tab-bar");
+    if (!bar) return;
+    var slot = bar.querySelector(".h-search-slot");
+    if (!slot) {
+      slot = document.createElement("div");
+      slot.className = "h-search-slot";
+      var brand = bar.querySelector(".h-brand");
+      if (brand && brand.nextSibling) bar.insertBefore(slot, brand.nextSibling);
+      else bar.appendChild(slot);
+    }
+    if (search.parentElement !== slot) slot.appendChild(search);
+  }
+
   function buildTabs() {
     if (document.querySelector(".h-tab-bar")) return true;  // already built
 
@@ -87,8 +127,15 @@
     document.documentElement.classList.add("h-tabs-ready");  // gates the CSS that hides the sidebar
 
     if (window.frappe && frappe.router && frappe.router.on) {
-      frappe.router.on("change", function () { updateActive(bar); });
+      frappe.router.on("change", function () {
+        updateActive(bar);
+        // فرابي بيعيد بناء .page-head (وبالتالي عنصر البحث) مع كل
+        // تنقّل — بلا setTimeout الترحيل بيسبق إعادة البناء وياخد
+        // عنصرًا لسه في طريقه للحذف
+        setTimeout(relocateWorkspaceSearch, 0);
+      });
     }
+    relocateWorkspaceSearch();
     return true;
   }
 

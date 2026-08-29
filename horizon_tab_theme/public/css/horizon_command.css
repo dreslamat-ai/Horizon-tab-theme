@@ -700,6 +700,24 @@ html.h-tabs-ready body{ padding-top: var(--h-tabbar-h) !important; }
    اللي كان معمول لحرف "H" النصي القديم لسه محتاج يفضل عشان التباين
    على الشريط الغامق، الصورة بس بقت جوّاه بدل النص */
 .h-tab-bar .h-brand .mark img{ width: 15px; height: 15px; object-fit: contain; display: block; }
+
+/* بلاغ المالك (٢٩ أغسطس): شريط فرابي القياسي (بحث/اسم الـWorkspace/فتح
+   السايدبار) على صفحة Workspace نفسها كان بيكرر شريط التابات بالظبط —
+   يتخفي على هذا المسار بس (.h-ws-page محقونة من horizon_command_tabs.js).
+   القوائم والنماذج فيها أزرار حقيقية («جديد»، فلاتر) في نفس الشريط،
+   فما بتتحطش هنا. */
+body.h-ws-page .page-head{ display: none !important; }
+
+/* أيقونة البحث المنقولة — نفس عنصر فرابي الأصلي (navbar-modal-search-mobile)
+   بعد نقله فعليًا (لا نسخه) جوّه شريط التابات، عشان تفضل شغّالة بربطها
+   الأصلي. flex:none عشان تفضل ثابتة جنب العلامة مش بتتحرك مع سكرول
+   التابات. */
+.h-tab-bar .h-search-slot{
+  display: flex; align-items: center; flex: none;
+  padding: 0 8px 8px; color: var(--h-on-dark-2);
+}
+.h-tab-bar .h-search-slot .navbar-modal-search-mobile{ cursor: pointer; }
+.h-tab-bar .h-search-slot .search-icon svg{ width: 17px; height: 17px; }
 .h-tab{
   display: flex; align-items: center; gap: 7px;
   padding: 9px 16px 8px;
