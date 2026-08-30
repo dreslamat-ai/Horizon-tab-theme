@@ -54,3 +54,12 @@ web_include_css = [
     "/assets/horizon_tab_theme/css/horizon_command_web.css",
     "/api/method/horizon_tab_theme.api.theme_css",
 ]
+
+# ---------------------------------------------------------------------------
+# لوحة بنتو الرئيسية — كانت بلوكًا يتيمًا في قاعدة بيانات سموك بس (مش
+# متتبَّع في الريبو، أي تركيب تاني للتطبيق ماكانش هيجيبه). بقت fixture
+# رسمية هنا (٣٠ أغسطس) فتتزرع تلقائيًا مع أي تركيب/ترحيل لـhorizon_tab_theme.
+# ---------------------------------------------------------------------------
+fixtures = [
+    {"dt": "Custom HTML Block", "filters": [["name", "=", "home-bento-dashboard-prototype"]]},
+]
