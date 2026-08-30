@@ -1002,3 +1002,23 @@ html.h-tabs-ready [class*="sidebar"][class*="workspace"]{
   .bento-card{ background-color:#fff !important; }
   .bento-ai{ background: linear-gradient(155deg, var(--h-navy-700), var(--h-navy-950)) !important; }
 }
+
+/* ============================================================================
+   زرار الروابط — رفعة بظل عند hover (خيار ٢ من بروتوتايب المراجعة، ٣٠
+   أغسطس). الشكل المسطح الأساسي (حدود --h-navy، خلفية بيضاء، --h-r-sm)
+   موجود بالفعل فوق في قاعدة a:where(...) العامة — هنا إضافة ظل ورفعة
+   بس، مقصورة على .link-item تحديدًا (كروت Reports & Masters وصفحات
+   الموديول) مش كل رابط في الديسك، عشان الظل يفضل له معنى بصري (عنصر
+   قابل للنقر بارز) مش ضجيج على كل نص فيه رابط.
+
+   القيم من --h-shadow-1/--h-shadow-2 الموجودين بالفعل في الملف ده —
+   بلا اختراع رقم جديد، نفس لغة الظل المستخدَمة في .page-card فوق. */
+a.link-item{
+  box-shadow: var(--h-shadow-1);
+  transition: transform .18s cubic-bezier(.22,1,.36,1), box-shadow .18s ease, border-color .18s ease;
+}
+a.link-item:hover{
+  transform: translateY(-2px);
+  box-shadow: var(--h-shadow-2);
+  border-color: var(--h-navy-300) !important;
+}
