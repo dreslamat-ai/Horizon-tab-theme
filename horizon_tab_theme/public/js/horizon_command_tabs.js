@@ -108,7 +108,16 @@
       if (brand && brand.nextSibling) bar.insertBefore(slot, brand.nextSibling);
       else bar.appendChild(slot);
     }
-    if (search.parentElement !== slot) slot.appendChild(search);
+    if (search.parentElement !== slot) {
+      // بلاغ لقطة حقيقي (٣٠ أغسطس): أربع أيقونات بحث متكررة! فرابي بيعيد
+      // بناء .page-head (وبالتالي عنصر بحث جديد بالكامل، مش نفس العقدة)
+      // مع كل تنقّل Workspace — وappendChild هنا كان بيضيف العنصر الجديد
+      // فوق القديم بلا ما يشيله، فكل تنقّل كان بيراكم أيقونة زيادة في
+      // الشريحة بدل ما يستبدلها. التفريغ هنا قبل الإضافة يضمن عنصر واحد
+      // بس دايمًا مهما اتكرر بناء .page-head.
+      while (slot.firstChild) slot.removeChild(slot.firstChild);
+      slot.appendChild(search);
+    }
   }
 
   function buildTabs() {
