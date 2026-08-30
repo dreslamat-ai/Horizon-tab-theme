@@ -6,6 +6,13 @@ fuller comment on why a raw werkzeug Response is used instead of a plain
 <link rel="stylesheet"> can't parse). Kept as its own independent copy
 here rather than imported from horizon_theme, since this app is meant to
 run with zero dependency on horizon_theme being installed at all.
+
+Lives in api/__init__.py (not a sibling api.py) so that
+horizon_tab_theme.api.theme_css stays reachable now that api/dashboard_feed
+and api/tab_manager made `api` a package — a flat api.py alongside a
+package of the same name is shadowed by the package on import, which
+silently broke this endpoint (417 "no attribute theme_css") until this
+merge.
 """
 
 import frappe
