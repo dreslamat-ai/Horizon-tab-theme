@@ -744,7 +744,10 @@ body.h-ws-page .page-head{ display: none !important; }
   padding: 0 8px 8px; color: var(--h-on-dark-2);
 }
 .h-tab-bar .h-search-slot .navbar-modal-search-mobile{ cursor: pointer; }
-.h-tab-bar .h-search-slot .search-icon svg{ width: 17px; height: 17px; }
+/* نفس عطل أيقونات التابات بالظبط (بلاغ لقطة حقيقي، ٣٠ أغسطس): أيقونة
+   البحث المنقولة من فرابي بترسم بـ--icon-stroke لا color، وقيمته
+   الافتراضية رمادي غامق ثابت — شبه مختفٍ على خلفية الشريط الكحلي. */
+.h-tab-bar .h-search-slot .search-icon svg{ width: 17px; height: 17px; --icon-stroke: var(--h-on-dark); }
 .h-tab{
   display: flex; align-items: center; gap: 7px;
   padding: 9px 16px 8px;
