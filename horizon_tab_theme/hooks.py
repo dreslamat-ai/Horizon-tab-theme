@@ -31,24 +31,10 @@ required_apps = []  # theme-only: installs cleanly alongside any app, including 
 app_include_css = [
     "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&display=swap",
     "/assets/horizon_tab_theme/css/horizon_command.css",
-    # منقول من horizon_desk_theme (٣٠ أغسطس) — كروت البوستر، النماذج،
-    # القوائم. لازم يفضل قبل theme_css عشان الإعدادات الحيّة تكسب أي
-    # تعارض بترتيب التحميل، مش !important.
-    "/assets/horizon_tab_theme/css/horizon_module_poster.css",
     "/api/method/horizon_tab_theme.api.theme_css",
 ]
 app_include_js = [
     "/assets/horizon_tab_theme/js/horizon_command_tabs.js",
-    # منقولون من horizon_desk_theme (٣٠ أغسطس) — بلا horizon_rail.bundle.js
-    # (الرايل بديله شريط التابات) ولا horizon_desk_theme.bundle.js (كان
-    # بيحقن --primary كـinline style على <html>، بيغلب theme_css) ولا
-    # horizon_desktop.bundle.js (سطح مكتب overlay كامل، هيتعارض بصريًا مع
-    # بروتوتايب داشبورد البنتو الموجود فعلًا — قرار منفصل مؤجَّل).
-    "/assets/horizon_tab_theme/js/horizon_module_poster.bundle.js",
-    "/assets/horizon_tab_theme/js/horizon_widget_cluster.bundle.js",
-    "/assets/horizon_tab_theme/js/horizon_form_layout.bundle.js",
-    "/assets/horizon_tab_theme/js/horizon_list_layout.bundle.js",
-    "/assets/horizon_tab_theme/js/horizon_module_layout.bundle.js",
 ]
 # horizon_command_tabs.js is the ONLY static JavaScript in this app (kept
 # its filename across the rename — only the app folder/import path changed)
