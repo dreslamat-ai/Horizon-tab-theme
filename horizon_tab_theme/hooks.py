@@ -30,7 +30,7 @@ required_apps = []  # theme-only: installs cleanly alongside any app, including 
 # ---------------------------------------------------------------------------
 app_include_css = [
     "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&display=swap",
-    "/assets/horizon_tab_theme/css/horizon_command.css?v=20260830g",  # كلاودفلير بيكاش الأصول الثابتة بلا نسخة — نفس درس اليوم المتكرر
+    "/assets/horizon_tab_theme/css/horizon_command.css?v=20260830h",  # كلاودفلير بيكاش الأصول الثابتة بلا نسخة — نفس درس اليوم المتكرر
     "/api/method/horizon_tab_theme.api.theme_css",
 ]
 app_include_js = [

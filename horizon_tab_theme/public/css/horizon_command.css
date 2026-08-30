@@ -1022,3 +1022,9 @@ a.link-item:hover{
   box-shadow: var(--h-shadow-2);
   border-color: var(--h-navy-300) !important;
 }
+/* بلاغ المالك: شيل أيقونة السهم من زرار الروابط كلها — النص وحده كافٍ،
+   السهم كان زيادة بصرية بلا فايدة حقيقية جوّه الزرار نفسه (زي ما الرفعة
+   والظل فوق بيوضّحوا إنه قابل للنقر أصلًا). */
+a.link-item svg{
+  display: none !important;
+}
