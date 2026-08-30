@@ -31,10 +31,26 @@ required_apps = []  # theme-only: installs cleanly alongside any app, including 
 app_include_css = [
     "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600&display=swap",
     "/assets/horizon_tab_theme/css/horizon_command.css",
+    # منقول من horizon_desk_theme (٣٠ أغسطس) — كروت البوستر، النماذج،
+    # القوائم. لازم يفضل قبل theme_css عشان الإعدادات الحيّة تكسب أي
+    # تعارض بترتيب التحميل، مش !important.
+    # ?v= (٣٠ أغسطس، تصحيح الدمج): كلاودفلير قدام *.horizonerp.cloud بيكاش
+    # الأصول الثابتة — نفس درس صفحة الدخول، لازم رقم نسخة جديد مع أي تعديل.
+    "/assets/horizon_tab_theme/css/horizon_module_poster.css?v=20260830f",
     "/api/method/horizon_tab_theme.api.theme_css",
 ]
 app_include_js = [
     "/assets/horizon_tab_theme/js/horizon_command_tabs.js",
+    # منقولون من horizon_desk_theme (٣٠ أغسطس) — بلا horizon_rail.bundle.js
+    # (الرايل بديله شريط التابات) ولا horizon_desk_theme.bundle.js (كان
+    # بيحقن --primary كـinline style على <html>، بيغلب theme_css) ولا
+    # horizon_desktop.bundle.js (سطح مكتب overlay كامل، هيتعارض بصريًا مع
+    # بروتوتايب داشبورد البنتو الموجود فعلًا — قرار منفصل مؤجَّل).
+    "/assets/horizon_tab_theme/js/horizon_module_poster.bundle.js?v=20260830f",
+    "/assets/horizon_tab_theme/js/horizon_widget_cluster.bundle.js?v=20260830f",
+    "/assets/horizon_tab_theme/js/horizon_form_layout.bundle.js?v=20260830f",
+    "/assets/horizon_tab_theme/js/horizon_list_layout.bundle.js?v=20260830f",
+    "/assets/horizon_tab_theme/js/horizon_module_layout.bundle.js?v=20260830f",
 ]
 # horizon_command_tabs.js is the ONLY static JavaScript in this app (kept
 # its filename across the rename — only the app folder/import path changed)
@@ -51,6 +67,12 @@ app_include_js = [
 # endpoint (it's allow_guest=True for exactly this reason).
 # ---------------------------------------------------------------------------
 web_include_css = [
-    "/assets/horizon_tab_theme/css/horizon_command_web.css",
+    "/assets/horizon_tab_theme/css/horizon_command_web.css?v=20260830e",  # نفس درس كاش كلاودفلير — بلا رقم نسخة إضافة .h-alaa-fab ماكانتش هتوصل خالص
     "/api/method/horizon_tab_theme.api.theme_css",
+]
+web_include_js = [
+    # زرار "اتكلم مع ألاء" العايم — إضافي بحت، بلا أي لمس لمنطق تسجيل
+    # الدخول. رابط ثابت لـhorizonerp.cloud (ألاء مركّبة هناك فعليًا) —
+    # قرار مؤقت لحد ما يُحدَّد وجهة أدق (واتساب دعم مثلًا).
+    "/assets/horizon_tab_theme/js/horizon_login_alaa.js?v=20260830e",  # كلاودفلير قدام e.horizonerp بيكاش الملفات الثابتة — نفس درس ?v= المسجَّل قبل كده
 ]
