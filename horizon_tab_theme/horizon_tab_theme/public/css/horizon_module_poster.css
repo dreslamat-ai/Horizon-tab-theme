@@ -1,0 +1,2164 @@
+/* منقول من horizon_desk_theme (HPS-Theme) — كروت البوستر وتنسيق
+ * النماذج/القوائم/الموديولات، بعد إسقاط ما يخص الرايل القديم (شريط
+ * التابات بديله) والخط المفروض بـ!important (theme_css الديناميكي
+ * هو مصدر الخط الوحيد هنا الآن). تفاصيل كل قرار موثّقة في التعليقات
+ * الأصلية أدناه — أُبقيت كاملة لأنها سند كل قاعدة.
+ */
+
+// نظام توكنز Horizon Desk البصري — المرحلة ب من "نظام Horizon Desk البصري الشامل"
+// كل قيمة هنا منقولة حرفياً من الوثيقة المعتمدة (ب.١) — لا تُعدَّل بلا رجوع للوثيقة.
+//
+// قاعدة استخدام صارمة: --h-blue-500 محجوز حصرياً لتأكيد نجاح الحضور في ESS،
+// ولا يُستخدم كحالة "قبول" في أي مكان — لحالة القبول لونها الخاص --h-approved-fg.
+
+:root {
+  /* Navy ramp */
+  --h-navy-50: #F4F6F9; --h-navy-100: #E4E9F0; --h-navy-200: #C3CEDC; --h-navy-300: #93A6C0;
+  --h-navy-400: #65799E; --h-navy-500: #3E5578; --h-navy-600: #1D2D44; --h-navy-700: #172438;
+  --h-navy-800: #121D2E; --h-navy-900: #0B131F;
+
+  /* Blue ramp */
+  --h-blue-50: #F2F6FB; --h-blue-100: #E8EFF7; --h-blue-200: #C9DAEC; --h-blue-300: #A2C0E0;
+  --h-blue-400: #7CA3D6; --h-blue-500: #5083BC; --h-blue-600: #3F6A9E; --h-blue-700: #325480;
+  --h-blue-800: #263F60; --h-blue-900: #1A2B44;
+
+  /* Neutral ramp — navy-tinted, not pure gray */
+  --h-gray-25: #FCFCFB; --h-gray-50: #F5F5F3; --h-gray-100: #ECEDEA; --h-gray-200: #D8D9D5;
+  --h-gray-300: #B4B6B0; --h-gray-400: #8A8F95; --h-gray-500: #63666B; --h-gray-600: #454852;
+  --h-gray-700: #2E313A; --h-gray-900: #221f1f;
+
+  /* Semantic */
+  --h-pending-bg: #FBF0DC; --h-pending-fg: #B8860B;
+  --h-approved-bg: #E4EEE7; --h-approved-fg: #4E7A5C;
+  --h-rejected-bg: #F4E2DF; --h-rejected-fg: #B04A3F;
+  --h-info-bg: #E8EFF7; --h-info-fg: #5083BC;
+
+  /* Elevation — navy-tinted shadows, never pure black */
+  --h-shadow-1: 0 1px 3px rgba(29, 45, 68, .06);
+  --h-shadow-2: 0 6px 16px rgba(29, 45, 68, .08);
+  --h-shadow-3: 0 16px 36px rgba(29, 45, 68, .14);
+
+  /* Radius */
+  --h-radius-sm: 12px; --h-radius-md: 16px; --h-radius-lg: 20px; --h-radius-xl: 26px;
+}
+
+/*
+ * أوفررايد متغيّرات CSS الخاصة بـFrappe Desk (v15) بهوية Horizon.
+ * كل اسم متغيّر هنا مُتحقَّق فعليًا من الملف المبني
+ * (sites/assets/frappe/dist/css/desk.bundle.*.css) قبل الكتابة، مش مفترَض.
+ *
+ * القيم مطابقة لـHorizon ESS Settings (مصدر الحقيقة الوحيد) — تُحقَن فوقها
+ * ديناميكيًا وقت التشغيل عبر horizon_desk_theme.bundle.js. القيم هنا مجرد
+ * fallback ثابت وقت البناء، تفضل متطابقة يدويًا مع القيم الحية.
+ *
+ * ⚠ الحقن الديناميكي بيحط --primary/--primary-color كـinline style على
+ * <html> — ده بيغلب أي قاعدة هنا وقت التشغيل الفعلي. فحص "هل التوكن ده
+ * شغّال؟" على --primary تحديدًا هيرجع نجاح حتى لو الربط هنا غلط، لأن
+ * الـJS بيغطّيه دايمًا. التحقّق الحقيقي لهذا الربط ساكن (على الـCSS
+ * المبني) لا وقت تشغيل.
+ */
+
+/* مجموعة أ — ثابتة في الوضع الفاتح والليلي معًا (dark.scss ما بيلمسهاش) */
+:root {
+	--primary: var(--h-navy-600);
+	--primary-color: var(--h-navy-600);
+}
+
+/*
+ * مجموعة ب — الوضع الفاتح بس. لازم تُستثنى صراحة من الليلي لأن :root
+ * و[data-theme="dark"] عندهم نفس الخصوصية بالظبط — قاعدة على :root بلا
+ * شرط هتلغي أوفررايد dark.scss حتى لو المستخدم فعليًا في وضع ليلي.
+ *
+ * --fg-color ممنوع يتلمس هنا: بيغذّي --card-bg و--text-dark (لون نص!) —
+ * لو اتحط فيه لون خلفية فاتح هيبوّظ لون النص. --card-bg/--control-bg
+ * بيتعرّفوا منفصلين بدل ما يوروثوا من --fg-color.
+ */
+[data-theme="light"], :root:not([data-theme="dark"]) {
+	--bg-color: #DFE0DB;
+	--card-bg: #DFE0DB;
+	--control-bg: #DFE0DB;
+	--text-color: #221f1f;
+	--heading-color: #221f1f;
+}
+
+/*
+ * مجموعة ج — الوضع الليلي بس. الكحلي الأساسي كخلفية زر ممتاز في الوضعين،
+ * لكن كلون رابط/تقدّم فوق خلفية ليلية قريبة من الأسود تباينه ضعيف —
+ * درجة أفتح هنا بقرار صريح من المالك (١٥ أغسطس ٢٠٢٦).
+ *
+ * #4C5E77 قيمة حرفية مقصودة، مش خطوة في تدرج --h-navy — أقرب خطوتين
+ * (--h-navy-500 #3E5578 و--h-navy-400 #65799E) مالهمش نفس التباين اللي
+ * وافق عليه المالك بالعين. متتبدلش بخطوة تدرج بحجة تنظيف الملف.
+ */
+[data-theme="dark"] {
+	--primary: #4C5E77;
+	--primary-color: #4C5E77;
+}
+
+
+/*
+ * المرحلة ج — الخلفية العامة المشبَّعة. قيم حرفية من الوثيقة (مش من
+ * تدرجات --h-navy/--h-blue) — ٥ فقاعات لونية منفصلة عن نظام التوكنز
+ * عمدًا، قرار تصميمي في الوثيقة نفسها.
+ *
+ * الأولوية: Frappe الأصلي بيحط `body{background-color:var(--bg-color)}`
+ * (خصوصية 0,0,1، نفس خصوصية القاعدة هنا). horizon_desk_theme.bundle.css
+ * بيتحمَّل آخر ملف CSS في الصفحة فعليًا (اتأكّد بـcurl على /app بجلسة
+ * موثَّقة — بعد frappe/erpnext/hrms) فبيكسب بترتيب التحميل بلا حاجة
+ * لـ!important.
+ *
+ * ⚠ تحذير أداء غير محسوم: `background-attachment: fixed` مع عدة
+ * radial-gradient ممكن يهنّج على أجهزة/متصفحات ضعيفة (تحذير الوثيقة
+ * نفسها). ملوش جهاز ضعيف نقيس عليه هنا — لو المالك لاحظ تهنيج فعلي عند
+ * السكرول، البديل: تصدير الخلفية كـPNG/SVG ثابت بدل حسابها حيّ.
+ */
+/* 🔴 عطل حقيقي اتقاس (بلاغ المالك بلقطة حقيقية من جهازه: "الخلفية
+ * الجديدة مقطوعة على الموبايل" + "فراغ كبير مش مفهوم في نهاية
+ * الصفحة"): body عندها height=900px (بالظبط ارتفاع الـviewport)
+ * بينما scrollHeight الفعلي=1917px (أكتر من الضعف) — مؤكَّد بفحص
+ * getComputedStyle حيّ. background-attachment:fixed مربوط بحدود
+ * الـbox نفسه (900px) لا viewport، فآخر نص المحتوى (900-1917px) يطلع
+ * بلا خلفية على الإطلاق. الإصلاح: height:auto مع min-height:100%
+ * يضمن body تاخد طول المحتوى الفعلي دايمًا. */
+body {
+	/* 🔴 تدريج كحلي خفيف فقط (بلاغ المالك "بدون دوشة الألوان"): كانت خمس
+	 * دوائر مشبَّعة (أزرق/أخضر/بيج/بنفسجي)، استُبدلت بلمستين navy فاتحتين
+	 * جدًا على أبيض مائل لرمادي — نفس palette الديسكتوب و.main-section.
+	 * شيلنا background-attachment:fixed (iOS لا يدعمه، وسبَّب فراغ الموديولات). */
+	background:
+		radial-gradient(circle at 22% 16%, #CBD8EA 0%, transparent 60%),
+		radial-gradient(circle at 82% 88%, #D6E0EF 0%, transparent 54%),
+		#F1F4F9;
+	height: auto !important;
+	min-height: 100%;
+}
+
+html {
+	min-height: 100%;
+}
+
+/*
+ * 🔴 اكتشاف حقيقي بالقياس (screenshot حقيقي على /app بجلسة موثَّقة):
+ * تدرّج body وحده اتحقّن صح (اتأكّد بـcomputed style) لكن **ماكانش ظاهر
+ * بصريًا خالص** — `.page-container` (عنصر Frappe الحقيقي، مش بطاقة)
+ * بياخد كل مساحة المحتوى تحت الهيدر ومعاه `background-color:
+ * var(--bg-color)` بخصوصية class (0,1,0) أعلى من `body` (0,0,1)، فبيحجب
+ * التدرج بالكامل بغض النظر عن ترتيب التحميل. لازم يتفرّغ صراحة —
+ * `--bg-color` نفسه ما بيتلمسش لأنه مستخدَم في widgets/cards حقيقية
+ * تانية (`--card-bg` منفصل زي ما اتوثّق قبل كده، لكن `.links-widget-box`
+ * وغيرها بتستخدم `--bg-color` مباشرة برضه).
+ */
+.page-container {
+	background: transparent;
+}
+
+/*
+ * 🔴 اكتشاف حقيقي تاني (فحص DOM على صفحة workspace فعلية، لا افتراض):
+ * `.page-container` كانت كافية للصفحة الرئيسية بس مش لكل الصفحات —
+ * صفحات الـworkspace اللي فيها محتوى Editor.js (زي "المخازن") عندها
+ * حاوية إضافية `.layout-main-section` بخلفية بيضاء صلبة، منفصلة تمامًا
+ * عن `.page-container`. الكروت نفسها (`.widget`) عندها خلفيتها الخاصة
+ * المنفصلة، فتفريغ الحاوية دي آمن بنفس منطق `.page-container`.
+ *
+ * 🔴 محاولة أولى بقاعدة `.layout-main-section{background:transparent}`
+ * البسيطة **فشلت رغم وجودها في الـCSS المبني** — قسناها بـcomputed
+ * style فعليًا لقيناها لسه بيضاء. السبب: Frappe نفسها عندها قاعدة أدقّ
+ * `[data-page-route="Workspaces"] .layout-main-section{background-color:
+ * var(--fg-color)}` بخصوصية أعلى (attribute+class = 0,2,0 مقابل 0,1,0
+ * بتاعتنا) — بتغلب بغض النظر عن ترتيب تحميل الملفات. الحل: نفس مستوى
+ * الخصوصية بنفس الـselector، لا `!important` عام قد يأثر على صفحات
+ * تانية معندهاش نفس القاعدة.
+ */
+.layout-main-section {
+	background: transparent;
+}
+
+[data-page-route="Workspaces"] .layout-main-section {
+	background: transparent;
+}
+
+/*
+ * تحسينات بصرية إضافية — طبقة فوق نفس البنية، مش استبدال منطق.
+ * قيم الاستدارة من --border-radius-* الحقيقية في espresso/_borders.scss،
+ * لا أرقام مخترَعة.
+ */
+.widget,
+.form-page .form-layout,
+.list-row-container,
+.frappe-card {
+	border-radius: var(--border-radius-md);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .06);
+}
+
+.btn {
+	border-radius: var(--border-radius);
+}
+
+/* حركة تحميل shimmer بدل الـspinner الافتراضي — CSS بصري بس، بلا تغيير
+   توقيت أو منطق التحميل نفسه */
+.frappe-list-skeleton .skeleton-row,
+[class*="skeleton"] {
+	background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+	background-size: 200% 100%;
+	animation: horizon-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes horizon-shimmer {
+	0% {
+		background-position: 200% 0;
+	}
+
+	100% {
+		background-position: -200% 0;
+	}
+}
+
+/* انتقال fade خفيف — الكلاس ده بيتحط/يتشال عبر horizon_transitions.bundle.js */
+.horizon-page-fade {
+	animation: horizon-fade-in .18s ease-out;
+}
+
+@keyframes horizon-fade-in {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}
+
+/*
+ * المرحلة د — البطاقة الزجاجية، الوحدة البصرية الموحَّدة (أيقونات سطح
+ * المكتب، أزرار الإجراءات، بطاقات التقارير/الحالة). قيم حرفية من
+ * الوثيقة. ⚠ ممنوع .h-glass على صف جدول طويل (تحذير أداء الوثيقة نفسها:
+ * backdrop-filter على عشرات العناصر في شاشة واحدة مكلف) — الحاويات
+ * الكبيرة بس، والجداول تاخد خلفية صلبة خفيفة.
+ */
+.h-glass {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .62), rgba(255, 255, 255, .16));
+	backdrop-filter: blur(16px) saturate(160%);
+	-webkit-backdrop-filter: blur(16px) saturate(160%);
+	border: 1px solid rgba(255, 255, 255, .65);
+	box-shadow: var(--h-shadow-2), inset 0 1px 1px rgba(255, 255, 255, .85);
+	border-radius: var(--h-radius-lg);
+}
+
+.h-poster-card {
+	width: 172px;
+	height: 172px;
+	padding: 18px;
+	display: flex;
+	flex-direction: column;
+	transition: transform .22s cubic-bezier(.34, 1.56, .64, 1), box-shadow .22s ease;
+}
+
+.h-poster-card:hover {
+	transform: translateY(-6px);
+	box-shadow: var(--h-shadow-3), inset 0 1px 1px rgba(255, 255, 255, .85);
+}
+
+/*
+ * المرحلة و (نطاق مصغَّر، موثَّق صراحة) — طابع poster-card بصري على
+ * كروت سطح المكتب **الحقيقية** الموجودة فعليًا في Frappe
+ * (`.widget.links-widget-box` — مؤكَّدة بفحص DOM حيّ، مش اسم مفترَض).
+ *
+ * 🔴 فجوة نطاق مُعلَنة: الوثيقة تطلب منطق Odoo كامل (سطح مكتب ← نقرة ←
+ * شبكة إجراءات موديول) وسطر إحصائية حقيقية لكل موديول من استعلام
+ * فعلي بعد تحديد المقياس مع المالك. الاتنين **مش منفَّذين هنا** — الأول
+ * يحتاج إعادة بناء منطق تنقل Frappe الأساسي (نفس فئة خطورة المرحلة هـ)،
+ * والتاني يحتاج تحديد صريح "أي رقم لكل موديول" لسه ماحصلش. اللي
+ * اتنفَّذ فعليًا: **الطابع البصري فقط** (مقاس شبيه، زجاج، ظل، استدارة)
+ * فوق الكروت الحقيقية بروابطها وبياناتها الأصلية بلا أي تغيير سلوكي —
+ * قرار أفضل من فبركة رقم يبان حقيقي وهو مش كذلك على شاشة مالية.
+ */
+/*
+ * بلا backdrop-filter عمدًا: الديسكتوب فيه ٨+ كارت فوق الطيّة على
+ * background-attachment:fixed أصلاً (تحذير أداء المرحلة د نفسه بيقول
+ * "الحاويات الكبيرة بس" مش عشرات الكروت). التدرج+الظل+الاستدارة كافيين
+ * لنفس الإحساس البصري بلا تكلفة blur مضاعفة.
+ *
+ * ⚠ Frappe الأصلي بيحط `background-color: var(--bg-color) !important`
+ * على `.links-widget-box` تحديدًا (مؤكَّد بـgrep على desk.bundle.css) —
+ * قيمة `background-color` هنا (الجزء الأخير من shorthand) هتتغلب،
+ * فالنتيجة الفعلية تدرج فوق `--bg-color` مش `--card-bg`. مقبول هنا
+ * لأن الاتنين نفس القيمة حرفيًا (#DFE0DB) في التوكنز الحالية — لو
+ * اتغيّروا لقيمتين مختلفتين مستقبلًا لازم مراجعة الفرق ده تاني.
+ */
+.widget.links-widget-box,
+.widget.shortcut-widget-box {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .55), rgba(255, 255, 255, .18)), var(--card-bg);
+	border: 1px solid rgba(255, 255, 255, .5);
+	border-radius: var(--h-radius-lg);
+	box-shadow: var(--h-shadow-2);
+	transition: transform .22s cubic-bezier(.34, 1.56, .64, 1), box-shadow .22s ease;
+}
+
+.widget.links-widget-box:hover,
+.widget.shortcut-widget-box:hover {
+	transform: translateY(-4px);
+	box-shadow: var(--h-shadow-3);
+}
+
+/*
+ * المرحلة ز — تحسينات الشاشات والمكوّنات التفصيلية (CSS بصري بس،
+ * بلا تغيير أي سلوك حفظ/تحقّق/تنقل).
+ */
+
+/* ز.٢ الحقول — تمديد قاعدة الاستدارة الموجودة أصلاً بدل تكرارها */
+input,
+select,
+textarea {
+	border-radius: var(--h-radius-sm);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+	border-color: var(--h-blue-500);
+}
+
+/*
+ * ز.٣ القوائم المنسدلة — .h-glass بدل قائمة بيضاء حادة، تحذير أداء
+ * الوثيقة نفسه بيستثني الصفوف الطويلة، مش قائمة اختيار قصيرة زي دي.
+ * `.select2-dropdown` مش موجودة في Frappe 15 (اتفحصت بـgrep، صفر
+ * تطابق — مش مستخدَمة هنا، مش قالب Select2 القديم) فاتشالت من القائمة.
+ */
+.awesomplete ul {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .85), rgba(255, 255, 255, .55)), #fff;
+	backdrop-filter: blur(12px) saturate(150%);
+	-webkit-backdrop-filter: blur(12px) saturate(150%);
+	border: 1px solid rgba(255, 255, 255, .65);
+	border-radius: var(--h-radius-md);
+	box-shadow: var(--h-shadow-2);
+}
+
+/*
+ * ز.٤ صفوف القوائم — ⚠ ممنوع .h-glass هنا (تحذير أداء صريح في الوثيقة:
+ * backdrop-filter على عشرات الصفوف مكلف). خلفية صلبة خفيفة بس.
+ */
+.list-row-container:hover {
+	background: var(--h-navy-50);
+}
+
+/*
+ * 🔴 ز.٥ غير منفَّذة هذه الجولة — فجوة نطاق موثَّقة، مش إسقاط صامت.
+ * `.page-head` عنصر واحد مشترك (1440×60) على **كل** صفحة في Desk —
+ * سطح المكتب، القوائم، التقارير، مش رأس نموذج مستند بس. تلوينه كحلي
+ * صلب من غير عزل دقيق لصفحة المستند تحديدًا كان هيكسر تباين النص على
+ * كل صفحة تانية (أزرار "تعديل"/القوائم المنسدلة لسه بلون غامق فوق
+ * كحلي). فحص DOM على شاشة Journal Entry حقيقية لإيجاد selector مستند
+ * منفصل عن `.page-head` العام لسه ماتعملش — يحتاج جلسة فحص مخصَّصة
+ * قبل أي محاولة تانية، مش تخمين على اسم صف.
+ */
+
+/*
+ * ز.٦ (جزء منها) — بطاقات الأرقام (Number Cards) في الـworkspace، زي
+ * "TOTAL STOCK VALUE"/"TOTAL WAREHOUSES" في صفحة المخازن. المحاولة
+ * الأولى (`.number-card-value`/`.summary-value`) كانت صفر تطابق فعلي —
+ * الاسم الصحيح `.number-widget-box`، مؤكَّد من
+ * apps/frappe/frappe/public/js/frappe/widgets/number_card_widget.js:26
+ * (`this.widget.addClass("number-widget-box")`) وgrep على desk.bundle.css
+ * المبني، لا تخمين. تخطيط "تركيز الرقم" الكامل (رقم مركزي + رسم مصغّر +
+ * مؤشر اتجاه) لسه غير منفَّذ — ده تعديل ترتيب لا تلوين بس، فجوة نطاق
+ * لسه قائمة.
+ */
+.number-widget-box {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .62), rgba(255, 255, 255, .16));
+	border: 1px solid rgba(255, 255, 255, .65);
+	border-radius: var(--h-radius-lg);
+	box-shadow: var(--h-shadow-2), inset 0 1px 1px rgba(255, 255, 255, .85);
+}
+
+/*
+ * المرحلة هـ (الخطوة ٩) — أول رايل حقيقي، **إضافي جنب** الشريط
+ * الجانبي القديم، مش بديل عنه. الشريط القديم `.desk-sidebar` على
+ * اليمين (RTL) — الرايل الجديد اتحط على أقصى اليسار عمدًا عشان
+ * الاتنين يبانوا مع بعض بلا تراكب، شكل مؤقت غير نهائي بقرار صريح من
+ * المالك لحد ما يتقرر الاستبدال الفعلي بعد اختبار الصلاحيات بحساب
+ * غير Administrator.
+ *
+ * breakpoint الموبايل (767.98px) نفسه المستخدَم فعليًا في Frappe
+ * لإخفاء الشريط القديم (`hidden-xs hidden-sm`)، مؤكَّد بـgrep على
+ * desk.bundle.css المبني، مش رقم مخترَع.
+ *
+ * 🔴 عطل حقيقي اتقاس بصريًا: `left: 0` هنا كان بيطلع الرايل على
+ * **اليمين** فعليًا، متراكب فوق الشريط القديم! السبب: نظام بناء
+ * Frappe بيولّد نسخة RTL تلقائيًا (`dist/css-rtl/`) بأداة بتقلب
+ * left⟷right فيزيائيًا في كل قاعدة، مؤكَّد بمقارنة مباشرة بين
+ * `dist/css/` (left:0) وnist/css-rtl/` الفعلي (right:0) بعد البناء.
+ * الحل: نكتب `right: 0` في المصدر هنا عمدًا — بعد التحويل التلقائي
+ * لنسخة RTL (اللي فعليًا بتتحمّل، اللغة الافتراضية `ar`) هتتحول
+ * لـ`left: 0` الصحيحة. **مش غلطة إملائية، عكس متعمَّد.**
+ */
+/* 🔴 تصحيح (٢٢ أغسطس ٢٠٢٦): المطلوب الرايل **يمين** في العربي (RTL)،
+   زي Frappe نفسه. المصدر `left: 0` يتحوّل تلقائيًا لـ`right: 0` في
+   css-rtl (يمين). التعليق الطويل فوق قديم ومعكوس المنطق — يُتجاهَل.
+   نفس القلب على `.h-desktop-launcher` و`.main-section` تحت. */
+.h-rail {
+	position: fixed;
+	top: 0;
+	left: 0;
+	bottom: 0;
+	width: 68px;
+	background: var(--h-navy-800);
+	z-index: 1000;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	padding: 14px 10px;
+	gap: 4px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	transition: width .22s ease;
+}
+
+/* الرايل الموسّع (زرّ ☰ يبدّله) — أسماء الموديولات جنب الأيقونات */
+.h-rail.h-rail-expanded {
+	width: 214px;
+}
+
+/* زرّ فتح/طيّ المنيو (بلاغ المالك: زرّ فتح + أسماء الموديولات) */
+.h-rail-toggle {
+	align-self: stretch;
+	min-height: 40px;
+	border: 0;
+	border-radius: 10px;
+	background: rgba(255, 255, 255, .08);
+	color: rgba(255, 255, 255, .85);
+	font-size: 19px;
+	line-height: 1;
+	cursor: pointer;
+	flex-shrink: 0;
+	margin-bottom: 6px;
+	transition: background .15s ease;
+}
+
+.h-rail-toggle:hover {
+	background: rgba(255, 255, 255, .16);
+	color: #fff;
+}
+
+/* 🔴 قائمة Frappe v16 الجانبية (.body-sidebar-container) وزرّ فتحها
+ * (.sidebar-toggle-btn ☰، بلاغ المالك "ايه زر المنيو ده") — مخفيان:
+ * الرايل هو الملاحة بهوية Horizon. v16 أضافهما افتراضيًا بدل
+ * .desk-sidebar القديم الذي كان الثيم يتعامل معه، فظهرا خارج تحكّمه. */
+/* اللوجو رابطٌ للرئيسية (/app) — بلاغ المالك: الضغط عليه لا يرجع. */
+.h-rail-logo-link {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 12px;
+	flex-shrink: 0;
+	text-decoration: none;
+}
+
+.h-rail-logo {
+	width: 34px;
+	height: auto;
+	flex-shrink: 0;
+}
+
+/*
+ * الخطوة ١٢ — أيقونات حقيقية بدل الحرف الأول. الاسم مصدره حقل بيانات
+ * حقيقي `Workspace.icon` (مؤكَّد بالفحص المباشر: "stock"، "accounting"،
+ * "sell"...، مش فاضي)، والـSVG نفسه بيتولَّد بنفس دالة Frappe الأصلية
+ * `frappe.utils.icon()` (apps/frappe/frappe/public/js/frappe/utils/
+ * utils.js:1204) — نفس الأيقونة الظاهرة في أي مكان تاني بالنظام لنفس
+ * القسم، بلا مكتبة أيقونات جديدة. `fill`/`stroke` بـcurrentColor عمدًا
+ * (الاتنين مع بعض) لأن فحص أيقونة مشابهة في خطوة سابقة (زرار "..."
+ * الرسم البياني) أثبت إن Frappe بتستخدم `stroke` غالبًا بلا fill ثابت
+ * مقفول — احتياط يغطي الحالتين بلا افتراض أي وحدة بعينها.
+ */
+.h-rail-item {
+	width: 100%;
+	min-height: 42px;
+	border-radius: var(--h-radius-md);
+	display: flex;
+	align-items: center;
+	justify-content: flex-start;
+	gap: 12px;
+	padding: 0 12px;
+	color: rgba(255, 255, 255, .55);
+	background: transparent;
+	text-decoration: none;
+	flex-shrink: 0;
+	cursor: pointer;
+}
+
+.h-rail-item svg {
+	width: 20px;
+	height: 20px;
+	fill: currentColor;
+	stroke: currentColor;
+	flex-shrink: 0;
+}
+
+/* اسم الموديول جنب الأيقونة — يظهر فقط عند توسّع الرايل (زرّ ☰)، محاذاة
+ * يمين (الاسم ملاصق للأيقونة جهة اليمين — بلاغ المالك). */
+.h-rail-label {
+	flex: 1 1 auto;
+	text-align: right;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 13.5px;
+	font-weight: 500;
+	opacity: 0;
+	transition: opacity .15s ease;
+}
+
+.h-rail.h-rail-expanded .h-rail-label {
+	opacity: 1;
+}
+
+.h-rail-item:hover {
+	background: rgba(255, 255, 255, .08);
+	color: #fff;
+}
+
+.h-rail-item.h-rail-active {
+	background: var(--h-blue-500);
+	color: #fff;
+}
+
+/*
+ * الخطوة ١٠ — القرار المعتمد: الرايل عمودي ٦٨px ثابت **دايمًا**، على
+ * الموبايل زي الديسكتوب بالظبط. مفيش نسخة "شريط أفقي تحت الشاشة" في
+ * المواصفة — الـmedia query اللي كان هنا (`flex-direction: row` عند
+ * ٧٦٧.٩٨px) كان انحراف عن المواصفة المعتمدة، مش تكيّف مقصود، فاتشال
+ * بالكامل. التوسيط الداخلي لكل أيقونة (`.h-rail-item`) أصلاً موجود
+ * وصحيح فوق (`display:flex; align-items:center; justify-content:center`)
+ * ومش محتاج أي media query خاص بيه — بيشتغل بنفس القاعدة في كل المقاسات.
+ */
+
+/*
+ * الخطوة ١١ — استكمال هوية صفحة المخازن (وأي صفحة workspace تانية).
+ *
+ * الشريط العلوي (`.navbar`) عنصر **عام** في كل /app (مش خاص بالمخازن)
+ * — مؤكَّد بفحص DOM حيّ (class="navbar navbar-expand"، خلفية بيضاء
+ * صلبة). تأثيره شامل على كل الصفحات عمدًا، مش تسريب نطاق.
+ */
+.navbar {
+	background: rgba(255, 255, 255, .55) !important;
+	backdrop-filter: blur(14px) saturate(160%);
+	-webkit-backdrop-filter: blur(14px) saturate(160%);
+	box-shadow: var(--h-shadow-1);
+}
+
+/*
+ * `.page-head` — نفس العنصر اللي رُفض تلوينه كحلي صلب في مرحلة سابقة
+ * (ز.٥) لأنه مشترك بين كل الصفحات (قوائم، تقارير، نماذج) مش خاص
+ * بصفحات workspace. الحل هنا مختلف وآمن: مقيَّد صراحة بـ
+ * `[data-page-route="Workspaces"]` — نفس آلية العزل اللي استُخدمت
+ * فعليًا وبنجاح مع `.layout-main-section` في المرحلة ج (اكتُشفت
+ * ومُختبرة، مش تخمين). بلا هذا التقييد كان هيكرر نفس عطل كسر التباين
+ * على كل صفحة تانية.
+ *
+ * لون النص الحالي (`#221f1f`) اتفحص فعليًا ولقيناه أصلًا يطابق
+ * `--h-gray-900` — متسق مع الهوية من غير أي تعديل، الخط Cairo مطبَّق
+ * فعليًا (اتأكَّد من computed style)، فمفيش داعي نلمس أي منهم.
+ */
+[data-page-route="Workspaces"] .page-head {
+	background: rgba(255, 255, 255, .4) !important;
+	backdrop-filter: blur(12px) saturate(150%);
+	-webkit-backdrop-filter: blur(12px) saturate(150%);
+}
+
+/*
+ * لون الرسم البياني — 🔴 اكتشاف حقيقي يناقض فرضية المهمة: مفيش إعداد
+ * ألوان مركزي واحد بيتحكم في كل الرسوم. كل سجل `Dashboard Chart` عنده
+ * حقل `color` خاص بيه (مؤكَّد من apps/frappe/frappe/public/js/frappe/
+ * widgets/chart_widget.js:658 get_chart_colors() → chart_doc.color)،
+ * بيتحقن كـinline style="fill:#..." وقت الرسم، مش عبر class CSS.
+ *
+ * فحصنا قاعدة البيانات: من ٨٥ رسم بياني، ٧٧ لونهم NULL (بيرجعوا للون
+ * افتراضي وردي #F683AE من مكتبة frappe-charts نفسها)، و٨ بس ليهم لون
+ * صريح مقصود (زي #a83333 أحمر لفواتير المشتريات — قد يكون دلاليًا).
+ *
+ * **القرار: تحديث بيانات لا CSS.** حدَّثنا حقل `color` في قاعدة
+ * البيانات لكل الـ٧٧ سجل الفارغ إلى `#5083BC` (--h-blue-500) — أثر
+ * شامل حقيقي على كل رسم بياني افتراضي بالنظام (زي ما طلبت المهمة)،
+ * بلا ما نلمس الـ٨ رسومات ذات اللون المقصود. لو استخدمنا CSS override
+ * عام (`.bar{fill:...!important}`) كان هيوحّد لون الـ٨ دول كمان
+ * ويلغي أي دلالة لونية متعمَّدة فيهم — خطر حقيقي تجنّبناه.
+ */
+
+/*
+ * أزرار "..." الصغيرة على الكروت — فحصنا فعليًا قبل أي CSS (لا افتراض):
+ *
+ * ١) بطاقات الأرقام (`.number-widget-box`): "..." **نص عادي**
+ *    (`<a data-toggle="dropdown">...</a>` جوّه `.card-actions.dropdown`)
+ *    مش SVG خالص — لونها الحالي `rgb(82,82,82)` عبر CSS `color` عادي،
+ *    قابلة للتلوين مباشرة بلا أي تعقيد.
+ *
+ * ٢) الرسم البياني (`.dashboard-widget-box`): "..." هنا فعلًا SVG
+ *    (`<use href="#icon-dot-horizontal">`)، لكن **مفيش أي `fill` ثابت
+ *    مقفول جوّه تعريف الـsymbol نفسه** (اتفحص الـ<path> مباشرة —
+ *    `fill-rule`/`clip-rule` بس، لا قيمة لون). اللون الحالي جايّ من
+ *    قاعدة Frappe عامة جدًا `use{stroke:var(--text-muted)}` (element
+ *    selector بلا class، بتأثر على أيقونات تانية كتير في النظام) —
+ *    فبدل تعديل `--text-muted` نفسها (تسريب نطاق واسع)، استهدفنا
+ *    selector أدق (`.chart-menu svg use`) بخصوصية أعلى تلقائيًا.
+ *
+ * ٣) كروت Quick Access/Masters & Reports (`.shortcut-widget-box`/
+ *    `.links-widget-box`): **مفيهاش "..." أصلًا** — بدالها indicator
+ *    pill (badge نصي زي "١٦ متاح") أو سهم SVG تنقّل مختلف تمامًا.
+ *    مفيش حاجة تتلوّن هنا لأن العنصر المطلوب غير موجود على هذه الكروت.
+ */
+.number-widget-box .card-actions > [data-toggle="dropdown"] {
+	color: var(--h-gray-500);
+}
+
+.dashboard-widget-box .chart-menu svg use {
+	stroke: var(--h-gray-500);
+}
+
+/*
+ * تقوية الزجاج على Quick Access/Masters & Reports (١٥ أغسطس) —
+ * القاعدة الأصلية (المرحلة ز) كانت تدرّج أبيض شفاف خفيف جدًا، بيبان
+ * شبه مفيهوش تأثير مقارنة ببطاقات الأرقام (اللي تلوينها من Frappe
+ * نفسه أصلاً مش من الثيم). هنا تدرّج بلون العلامة (h-blue) أوضح،
+ * بلا backdrop-filter عمدًا (اتشال قبل كده لأسباب أداء موثَّقة —
+ * ٨+ كارت فوق الطية). ينطبق على كل الموديولات (selector عام، مش
+ * مقصور على المخازن) لأنه CSS ثيم لا بيانات صفحة.
+ */
+.widget.links-widget-box,
+.widget.shortcut-widget-box {
+    background: linear-gradient(160deg, rgba(80, 131, 188, .22), rgba(255, 255, 255, .4)), var(--card-bg) !important;
+    border: 1px solid rgba(80, 131, 188, .28) !important;
+}
+
+/*
+ * تقوية الزجاج على Quick Access/Masters & Reports (١٥ أغسطس) —
+ * القاعدة الأصلية (المرحلة ز) كانت تدرّج أبيض شفاف خفيف جدًا، بيبان
+ * شبه مفيهوش تأثير مقارنة ببطاقات الأرقام (اللي تلوينها من Frappe
+ * نفسه أصلاً مش من الثيم). هنا تدرّج بلون العلامة (h-blue) أوضح،
+ * بلا backdrop-filter عمدًا (اتشال قبل كده لأسباب أداء موثَّقة —
+ * ٨+ كارت فوق الطية). ينطبق على كل الموديولات (selector عام، مش
+ * مقصور على المخازن) لأنه CSS ثيم لا بيانات صفحة.
+ */
+.widget.links-widget-box,
+.widget.shortcut-widget-box {
+    background: linear-gradient(160deg, rgba(80, 131, 188, .22), rgba(255, 255, 255, .4)), var(--card-bg) !important;
+    border: 1px solid rgba(80, 131, 188, .28) !important;
+}
+
+/*
+ * سطح المكتب الجديد (Desktop Launcher) — تنفيذ الفجوة الموثَّقة في
+ * المرحلة و ("منطق Odoo كامل: سطح مكتب ← نقرة ← موديول"، كانت مؤجَّلة
+ * وقتها لأنها "نفس فئة خطورة المرحلة هـ"). overlay إضافي فوق DOM
+ * الأصلي (مش استبدال أو حذف) — لو JS فشل لأي سبب، الصفحة الأصلية
+ * تحت الـoverlay لسه شغالة وقابلة للوصول.
+ *
+ * 🔴 تصحيح صريح (١٥ أغسطس): المقاس الأول اللي بنيته (١٧٢×١٧٢ مربع،
+ * من .h-poster-card القديمة بتاعة المرحلة د) كان قبل ما يوصلني الملف
+ * المرجعي الفعلي (horizon-final-poster-design.html). المقاس الحقيقي
+ * المعتمد: ارتفاع ١٩٦px ثابت + عرض مرن (شبكة ٥ أعمدة، لا مربع). طابقت
+ * القيم هنا حرفيًا من الملف: padding، radius، مقاس الأيقونة ٤٦px،
+ * الـtint بأوباسيتي ٠.٢٨ عبر ::before، مسافة الاسم ١٦px.
+ *
+ * 🔴 فجوة نطاق موثَّقة صراحة (لا إسقاط صامت): الملف المرجعي فيه سطر
+ * إحصائية (.poster-stat) وشريط تقدّم (.poster-bar) وبادج عدّاد
+ * (.poster-badge) لكل بطاقة — أرقام مثل "٩٨٪ التزام الإغلاق" أو
+ * "٤ أصناف منخفضة". دي بيانات حقيقية لازم تُشتقّ من استعلام فعلي لكل
+ * موديول (زي ما اتوثّق سابقًا في المرحلة و: "التاني يحتاج تحديد صريح
+ * أي رقم لكل موديول لسه ماحصلش"). **متعمَّد عدم فبركة أرقام** — اتسابت
+ * غير منفَّذة لحد ما يتحدد مصدر حقيقي لكل رقم مع المالك، مش اختصار.
+ *
+ * والملف المرجعي نفسه ديسكتوب بس (بلا أي media query) — الاستجابة
+ * للموبايل قرار مستقل مني، موثَّق هنا صراحة.
+ */
+/* 🔴 عطل حقيقي اتقاس (بلاغ المالك: "سطح المكتب من الموبايل بيبدأ من
+ * أيقونة الموارد البشرية ومش قادر أمرر لفوق"): align-items:center
+ * مع overflow-y:auto على flex container عرضه المحتوى (h-desktop-grid،
+ * ٢٦٣٣px ارتفاع فعلي) أطول من مساحة العرض (٨٤٤px) — مؤكَّد بفحص حيّ:
+ * scrollTop=0 (أعلى نقطة تمرير ممكنة) لكن gridTop=-894.5px (نص
+ * المحتوى فايض فوق حدود الرؤية بلا طريقة تمرير إليه). هذا سلوك
+ * flexbox قياسي موثَّق (align-items:center يوزّع الفائض على الطرفين
+ * بدل حجزه كمساحة تمرير من فوق). الملف المرجعي صُمِّم لعدد موديولات
+ * قليل يتّسع في الشاشة بلا حاجة تمرير، لكن مع ١٧ موديولاً حقيقيًا
+ * التمركز الرأسي غير عملي. الإصلاح: flex-start بدل center — يبدأ
+ * المحتوى من أعلى دايمًا، وpadding:40px الموجودة أصلاً كافية للمسافة
+ * البصرية العلوية. */
+.h-desktop-launcher {
+	position: fixed;
+	top: 0;
+	right: 0;
+	left: 68px;
+	/* 🔴 iOS Safari (بلاغ المالك "التمرير بيطلع بمزاجه" + فراغ أسفل الكروت):
+	 * bottom:0 يعادل 100vh، و100vh على iOS يحسب شريط عنوان Safari ضمن
+	 * الارتفاع فيظهر فراغ زائد أسفل المحتوى وتمرير مزدوج. 100dvh (الارتفاع
+	 * الديناميكي) يحسب الشريط فعليًا. لا يمكن قياسه على Chromium (بلا شريط
+	 * عنوان، 100dvh==100vh). */
+	height: 100dvh;
+	background:
+	radial-gradient(circle at 12% 8%, #EAF0F8 0%, transparent 42%),
+	radial-gradient(circle at 88% 22%, #E4EEE7 0%, transparent 38%),
+	radial-gradient(circle at 55% 92%, #F4E9DA 0%, transparent 42%),
+	#F0F1EE;
+	z-index: 50;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	padding: 40px;
+}
+
+.h-desktop-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+	gap: 16px;
+	max-width: 1020px;
+	width: 100%;
+}
+
+/* 🔴 عطل حقيقي اتقاس (بلاغ المالك بلقطة: "الكلام خارج حدود
+ * البوستر" — عناوين طويلة زي Employee Lifecycle Dashboard بتفيض
+ * برّه حواف الكارت). السبب: height:103px ثابتة بدل min-height —
+ * عنوان طويل يحتاج سطرين مش لاقي مساحة فيفيض بره الشكل الدائري.
+ * min-height تحافظ على نفس الحجم للعناوين القصيرة وتسمح للطويلة
+ * تتمدد. */
+.h-desktop-card {
+	min-height: 103px;
+	height: auto;
+	width: 100%; // بالعرض على كل الشاشات — .h-desktop-grid بقى auto-fill minmax(196px,1fr)، فالعرض الثابت هنا كان بيمنع الأعمدة من الانكماش تحت ١٩٦px ويسبّب فيضان أفقي بين ٧٦٨-١٠٤٤px (اتكشف فعليًا: scrollWidth>clientWidth عند ٧٦٨px)
+	border-radius: 26px;
+	padding: 20px 18px;
+	display: flex;
+	flex-direction: column;
+	text-decoration: none !important;
+	cursor: pointer;
+	transition: transform .22s cubic-bezier(.34, 1.56, .64, 1), box-shadow .22s ease;
+	opacity: 0;
+	animation: hCardPop .45s cubic-bezier(.16, 1, .3, 1) forwards;
+}
+
+@keyframes hCardPop {
+	from { opacity: 0; transform: translateY(14px) scale(.94); }
+	to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.h-desktop-grid .h-desktop-card:nth-child(1) { animation-delay: .04s; }
+.h-desktop-grid .h-desktop-card:nth-child(2) { animation-delay: .08s; }
+.h-desktop-grid .h-desktop-card:nth-child(3) { animation-delay: .12s; }
+.h-desktop-grid .h-desktop-card:nth-child(4) { animation-delay: .16s; }
+.h-desktop-grid .h-desktop-card:nth-child(5) { animation-delay: .2s; }
+.h-desktop-grid .h-desktop-card:nth-child(6) { animation-delay: .24s; }
+.h-desktop-grid .h-desktop-card:nth-child(7) { animation-delay: .28s; }
+.h-desktop-grid .h-desktop-card:nth-child(8) { animation-delay: .32s; }
+.h-desktop-grid .h-desktop-card:nth-child(9) { animation-delay: .36s; }
+.h-desktop-grid .h-desktop-card:nth-child(10) { animation-delay: .4s; }
+
+.h-desktop-card:hover {
+	transform: translateY(-7px);
+	box-shadow: 0 22px 40px rgba(29, 45, 68, .16);
+}
+
+.h-desktop-card-icon {
+	width: 46px;
+	height: 46px;
+	border-radius: 15px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: auto;
+	position: relative;
+}
+
+.h-desktop-card-icon::before {
+	content: "";
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	background: var(--h-card-tint, transparent);
+	opacity: .28;
+	z-index: -1;
+}
+
+.h-desktop-card-icon svg {
+	width: 20px;
+	height: 20px;
+	color: var(--h-card-tint);
+	fill: var(--h-card-tint);
+}
+
+.h-desktop-card-label {
+	font-size: 13.5px;
+	font-weight: 800;
+	margin-top: 16px;
+	color: var(--h-navy-600, #1D2D44);
+	line-height: 1.3;
+}
+
+/* توسيط محتوى البوستر أفقيًا — بطلب صريح من المالك. الأيقونة بعرض
+ * ثابت فمابتمطّطش مع align-items:stretch الافتراضي، فمحتاجة
+ * align-self:center صريح. النص بـtext-align:center. الشريط
+ * (.h-desktop-card-bar) اتعمّد يفضل من غيرهم — مفيش عرض ثابت له في
+ * JS لبطاقات التصنيف/الوصول السريع، فمحتاج يفضل stretch على طول
+ * عرض الكارت (توسيطه هيخليه يختفي لصفر عرض). */
+.h-desktop-card-icon {
+	align-self: center;
+}
+
+.h-desktop-card-label,
+.h-desktop-card-stat {
+	text-align: center;
+}
+
+.h-desktop-card-icon.h-desktop-card-icon--emoji {
+	font-size: 20px;
+	line-height: 1;
+}
+
+.h-desktop-card-stat {
+	font-size: 10px;
+	color: var(--h-navy-400, #8A8F95);
+	margin-top: 3px;
+	line-height: 1.5;
+}
+
+.h-desktop-card-bar {
+	height: 4px;
+	border-radius: 3px;
+	background: var(--h-card-bar-color, var(--h-blue-500, #5083BC));
+	margin-top: auto;
+	opacity: .65;
+}
+
+@media (max-width: 767.98px) {
+	.h-desktop-launcher {
+		/* بلاغ لقطة حقيقي (٢٤ أغسطس): أول صفّ كروت نصّه مخفي — اللونشر
+		 * fixed top:0 والنافبار (48px) فوقه، وحشوة الموبايل 16px مش كافية.
+		 * الحشوة العلوية = ارتفاع النافبار + 16px. خاصية رأسية — لا تتأثر
+		 * بقلب RTL. */
+		padding: calc(var(--navbar-height, 48px) + 16px) 16px 16px;
+	}
+	.h-desktop-grid {
+		grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+		gap: 12px;
+		max-width: 100%;
+	}
+}
+
+/*
+ * إخفاء الشريط الجانبي القديم (١٥ أغسطس) — الرايل + سطح المكتب الجديد
+ * هما وسيلة التنقل الوحيدة من دلوقتي. .desk-sidebar مؤكَّد حصريًا من
+ * كود Frappe نفسه (grep على apps/frappe) إنه الكلاس الوحيد الخاص
+ * بالتنقل ده تحديدًا — بعكس .overlay-sidebar/.list-sidebar المشتركين
+ * مع sidebar الفورمات والقوائم (فورم شير/تاجز، فلتر القائمة) واللي
+ * لازم يفضلوا شغالين. تأكيد التغطية قبل الإخفاء: الرايل وسطح المكتب
+ * الاتنين مؤكَّدين ٢٣/٢٣ رابط (نفس مصدر البيانات API)، قبل أي إخفاء.
+ */
+/*
+ * توحيد بنية صفحة المخازن (١٥ أغسطس) — بمقاس البطاقة الموحَّد ١٩٦px
+ * (نفس وحدة سطح المكتب، بعد التصحيح) ومضاعفاته، بأمر صريح "ابدأ
+ * بالمخازن ووثّق النمط عشان يتكرر بسهولة على موديولات تانية لاحقًا".
+ * مفعَّل فقط لمّا .h-uniform-module موجود على body (JS منفصل:
+ * horizon_module_layout.bundle.js، قايمة صريحة بالـslugs — إضافة
+ * موديول جديد = سطر واحد فيه، بلا أي CSS إضافي).
+ *
+ * كل الـselectors هنا أسماء حقيقية اتأكّدت بفحص DOM حيّ على
+ * demo.horizonerp.cloud، مش افتراض من نمط التسمية — البطاقة الرقمية
+ * فعليًا `number-widget-box` (مش `number-card-widget-box`)، والرسم
+ * البياني فعليًا `dashboard-widget-box` (مش `chart-widget-box`) —
+ * الاتنين خالفوا النمط المتوقَّع من باقي الأسماء.
+ *
+ * الرسم البياني والبطاقات المجمَّعة (روابط) اتسابوا بمضاعفات أكبر من
+ * ١٩٦ (لا مربع واحد بالظبط) عمدًا — ضغطهم لمربع واحد كان هيكسر قراءة
+ * الرسم أو يخفي روابط حقيقية داخل البطاقات المجمَّعة، وده "كسر وظيفة"
+ * مرفوض صراحة في تعليمات المهمة. البطاقات المجمَّعة (٤-٧ روابط لكل
+ * واحدة) بارتفاع auto بحد أدنى ١٩٦px بدل ارتفاع ثابت — منعًا لقصّ
+ * روابط حقيقية أو تمرير داخلي مخفي.
+ */
+.h-uniform-module .codex-editor__redactor {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	align-items: flex-start;
+}
+
+/*
+ * 🔴 تصحيح صريح (١٥ أغسطس، بعد ملاحظة المالك "التصميم غلط"): النسخة
+ * الأولى هنا كانت بتحجّم widgets Frappe الأصلية (shortcut/links) لمقاس
+ * موحَّد — تحسين هيكلي، لكن **مش poster cards حقيقية** زي قسم
+ * "module view" في horizon-final-poster-design.html. الصحّ: شورتكتس
+ * والروابط بتتحوّل poster cards حقيقية (نفس مكوّن سطح المكتب
+ * .h-desktop-card بالحرف — "used everywhere" حسب تعليق الملف المرجعي
+ * نفسه)، عبر horizon_module_poster.bundle.js. الكتل الأصلية بتتخفى
+ * (`.h-posterized-hidden`) مش تتحذف — لو الـJS فشل لأي سبب الصفحة
+ * الأصلية الكاملة السليمة لسه موجودة تحتها.
+ *
+ * بطاقة الرقم والرسم البياني **مش** poster (قرار متعمَّد لا إسقاط):
+ * تحويلهم لبطاقة أيقونة+اسم كان هيفقد المحتوى الحقيقي (الرقم الفعلي/
+ * الرسم البياني الفعلي) — كسر وظيفة مرفوض صراحة. اتسابوا بمقاسهم
+ * الموحَّد (١٩٦/٤٠٨) كتحسين بصري متّسق بس بلا فقد محتوى.
+ */
+/*
+ * 🔴 تصحيح استجابة (١٦ أغسطس، بعد ملاحظة المالك "القسم الأول بتاع
+ * الرسوم البيانية محتاج تنسيق متجاوب"): العرض الثابت (١٩٦/٤٠٨px) مع
+ * flex:0 0 (بلا انكماش) كان بيتصرّف صح بس لعدد عناصر معيَّن (المخازن:
+ * رسم+٢ بطاقة) — موديولات فيها عدد مختلف (المحاسبة: رسم+٤ بطاقات)
+ * كانت بتتكسّر لصفّين متفاوتين بفجوة واضحة، لأن ٤٠٨+١٩٦×٤+فراغات
+ * (١٢٥٦px) أكبر من عرض الحاوية (~١٠١٧px) والعناصر بترفض الانكماش.
+ * الحل: عناقيد CSS Grid حقيقية (auto-fill) بدل flex ثابت — بتحسب
+ * عدد الأعمدة المثالي لأي عرض ولأي عدد عناصر تلقائيًا، والرسم البياني
+ * بياخد مساحة ٢×٢ خلايا (`.h-widget-cluster-wide`، مضاف بـ
+ * horizon_widget_cluster.bundle.js). التجميع نفسه (تحديد إن دول
+ * "كتلة واحدة") بيحصل في JS لأن CSS لوحده مايقدرش يلمّ كتل EditorJS
+ * المتفرّقة في عنصر واحد.
+ */
+.h-widget-cluster {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+	grid-auto-rows: 196px;
+	gap: 16px;
+	width: 100%;
+	margin-bottom: 8px;
+}
+
+.h-widget-cluster > .ce-block {
+	width: 100% !important;
+	max-width: none !important;
+	flex: none !important;
+	height: 100%;
+	padding: 0 !important;
+}
+
+.h-widget-cluster > .ce-block.h-widget-cluster-wide {
+	grid-column: span 2;
+	grid-row: span 2;
+}
+
+@media (max-width: 480px) {
+	.h-widget-cluster {
+		grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+	}
+	.h-widget-cluster > .ce-block.h-widget-cluster-wide {
+		grid-column: span 1;
+	}
+}
+
+.h-uniform-module .number-widget-box,
+.h-uniform-module .dashboard-widget-box {
+	width: 100% !important;
+	height: 100% !important;
+}
+
+.h-posterized-hidden {
+	display: none !important;
+}
+
+.h-module-poster-grid {
+	margin-top: 8px;
+	flex-basis: 100%;
+}
+
+.h-module-poster-heading {
+	flex-basis: 100%;
+	font-size: 13px;
+	font-weight: 700;
+	color: var(--h-navy-400, #65799E);
+	margin: 12px 0 4px;
+	letter-spacing: .3px;
+}
+
+/*
+ * تصحيح شامل بعد ملاحظة المالك "غلط" على ثلاث نقاط محدَّدة (١٦ أغسطس):
+ * الخلفية، شكل الشورتكتس الداخلي، وبطاقة الرقم/الرسم البياني.
+ */
+
+/* ١) خلفية horizon-final-poster-design.html الحقيقية (٣ فقاعات هادئة
+ * على --mist) — مختلفة عمدًا عن خلفية body العامة (٥ فقاعات مشبَّعة
+ * من المرحلة ج، مصدرها ملف مرجعي تاني: reports-dashboard.html). القيم
+ * دي منسوخة حرفيًا من poster-design.html، مش مخترَعة. */
+/* الخلفية اتلغيت عمدًا — body.h-uniform-module بيرث تدرّج body العام
+ * (المرحلة ج، ٥ فقاعات مشبَّعة) بالتصميم، بعد ما المالك أكّد بمرجع
+ * horizon-journal-invoice-list-preview.html إن ده نفس المطلوب فعليًا،
+ * مش تدرّج poster-design.html الأهدأ اللي كان متطبَّق هنا غلط. */
+
+/* ٢) بطاقة الرقم والرسم البياني — نفس لغة .h-glass حرفيًا (قيم منسوخة
+ * من .glass في الملف المرجعي)، بدل تلوين Frappe الافتراضي. المحتوى
+ * الحقيقي (الرقم/الرسم) يفضل زي ما هو جوّه الإطار الجديد — مفيش فقد
+ * بيانات، بس تغيير خلفية/حدود/ظل. */
+.h-uniform-module .number-widget-box,
+.h-uniform-module .dashboard-widget-box {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .62), rgba(255, 255, 255, .16)) !important;
+	backdrop-filter: blur(16px) saturate(160%);
+	-webkit-backdrop-filter: blur(16px) saturate(160%);
+	border: 1px solid rgba(255, 255, 255, .65) !important;
+	border-radius: 26px !important;
+	box-shadow: 0 10px 24px rgba(29, 45, 68, .10), inset 0 1px 1px rgba(255, 255, 255, .85) !important;
+}
+
+/* ٣) تنظيف شكل الشورتكت جوّه إطار poster — إخفاء السهم الزائد
+ * (redundant مع كون الكارت كله قابل للنقر أصلاً)، وترتيب عمودي
+ * (أيقونة فوق، اسم تحتها) بدل الصف الأفقي الأصلي. البادج الحقيقي
+ * (زي "16 متاح"/"Pending 0") فضل ظاهر — بيانات حقيقية مش زخرفة. */
+.h-module-poster-item.shortcut-widget-box {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.h-module-poster-item .widget-head {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-top: 16px;
+	width: 100%;
+}
+
+.h-module-poster-item .widget-control svg {
+	display: none;
+}
+
+/* 🔴 عطل حقيقي اتقاس (بلاغ المالك: "توسيط مكونات البوستر كلها" —
+ * بادجات زي "Pending 0"/"16 متاح" ظاهرة يمين الكارت مش في المنتصف).
+ * فحص DOM حيّ كشف السبب: .widget-control و.indicator-pill جوّاها
+ * كلاهما display:flex من Frappe نفسه — text-align:center بيأثر بس
+ * على محتوى inline، مالوش أي تأثير على flex children. التوسيط
+ * الصحيح لعنصر flex هو justify-content على الأب. */
+.h-module-poster-item .widget-control {
+	margin-top: 6px;
+	display: flex;
+	justify-content: center;
+	width: 100%;
+}
+
+.h-module-poster-item .widget-title {
+	font-size: 13.5px;
+	font-weight: 800;
+	text-align: center;
+}
+
+.h-module-poster-item .indicator-pill {
+	font-size: 10px;
+	margin: 0 auto;
+}
+
+/* مستوى التصنيفات والدرِلداون جوّه صفحة موديول موحَّد (زي المخازن) —
+ * نفس نمط سطح المكتب ← موديول في horizon-final-poster-design.html،
+ * هنا تصنيف حقيقي (عنوان مجموعة links-widget-box الأصلي في Frappe) ←
+ * عناصره. المستوى التاني (subview) مخفي افتراضيًا، بيظهر بالنقر على
+ * بطاقة تصنيف. */
+.h-module-subview {
+	display: none;
+}
+
+.h-module-subview--open {
+	display: block;
+}
+
+.h-module-subview-back {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12.5px;
+	color: var(--h-navy-400, #8A8F95);
+	cursor: pointer;
+	font-weight: 600;
+	margin-bottom: 16px;
+}
+
+.h-module-subview-grid {
+	display: none;
+}
+
+.h-module-subview-grid.h-module-subview-grid--active {
+	display: grid;
+}
+
+.h-module-category-card {
+	cursor: pointer;
+}
+
+/* عنوان قسم Frappe الافتراضي (Shortcuts / Reports & Masters) — تنسيق
+ * بصري فوق نفس النص الحقيقي (بلا ترجمة ولا تغيير DOM)، يطابق طابع
+ * "section-label" في هوية Horizon (horizon-final-poster-design.html):
+ * حجم صغير، وزن ثقيل، لون كحلي مكتوم، تباعد حروف. */
+.h-uniform-module .ce-header {
+	margin: 28px 0 14px !important;
+}
+
+.h-uniform-module .ce-header .h4,
+.h-uniform-module .ce-header .h4 b {
+	font-family: inherit;
+	font-size: 11.5px !important;
+	font-weight: 700 !important;
+	color: var(--h-navy-400, #8A8F95) !important;
+	letter-spacing: .4px;
+	text-transform: uppercase;
+}
+
+/*
+ * شاشات المستندات (فورم) وشاشات القائمة — CSS بصري بس فوق البنية
+ * الحقيقية الموجودة، بلا أي DOM manipulation عبر JS وبلا لمس منطق
+ * حفظ/تحقّق. القيم منسوخة حرفيًا من
+ * horizon-journal-invoice-list-preview.html.
+ *
+ * السكوب: `.page-container:is(.editable-form, .submitted-form, .cancelled-form)` — مؤكَّد بفحص DOM حيّ (مش
+ * افتراض) إنه العلامة العامة لأي صفحة فورم مستند (بيحمل اسم الـDoctype
+ * الفعلي في data-page-route، زي "Journal Entry"/"Sales Invoice"، أيًّا
+ * كان النوع) — بعكس `.page-head` نفسها المشتركة مع كل أنواع الصفحات
+ * (قائمة/تقرير/سطح مكتب)، اللي رفضنا نلوّنها عام قبل كده (فجوة ز.٥
+ * موثَّقة سابقًا) عشان كانت هتكسر التباين على كل صفحة تانية. هنا
+ * السكوب دقيق فمأمون.
+ *
+ * جدول البنود (.form-grid) فضل زي ما هو تمامًا من ناحية البنية —
+ * مش <table> حقيقي أصلاً في Frappe (div-grid تفاعلي لإدخال/تعديل
+ * حيّ)، فتحويله لجدول HTML حرفي كان هيكسر التفاعل بالكامل. اللي
+ * اتعمل: تنسيق بصري (خلفية، حدود، مسافات) فوق نفس البنية التفاعلية.
+ */
+
+/*
+ * 🔴 عطل حقيقي اتكشف بفحص getComputedStyle: .form-page (الحاوية
+ * الأصلية اللي فيها كل form-section) عندها خلفية رمادية صلبة
+ * rgb(223,224,219) من Frappe نفسه — بتظهر في الفراغات بين كروت
+ * الزجاج (المسافات/الحواف)، فبيبان "رمادي يخالف الهوية" رغم إن كل
+ * كارت لوحده زجاجي صح. الحل: شفافية كاملة على الحاوية والصفحة نفسها،
+ * عشان تدرّج body المشبَّع يبان كامل من ورا كل الكروت.
+ */
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-page,
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-layout,
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-tabs-list,
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .layout-main-section,
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .layout-main-section-wrapper {
+	background: transparent !important;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form, [data-page-route^="List/"]) .page-head {
+	background: var(--h-navy-600, #1D2D44) !important;
+	border-radius: 22px;
+	margin: 12px 16px;
+	padding: 4px 10px;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form, [data-page-route^="List/"]) .page-head .title-text {
+	color: #fff !important;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form, [data-page-route^="List/"]) .page-head .sidebar-toggle-btn svg use {
+	fill: #fff;
+}
+
+/* .indicator-pill بألوان المرجع الحرفية دلوقتي (تحت) — قرار سابق
+ * "ماتتلمسش" اتلغى بطلب صريح "طبّق ألوان المرجع". */
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form, [data-page-route^="List/"]) .page-head .btn.btn-default {
+	background: rgba(255, 255, 255, .12) !important;
+	color: #fff !important;
+	border: none !important;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form, [data-page-route^="List/"]) .page-head .btn.btn-default svg use {
+	fill: #fff;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form, [data-page-route^="List/"]) .page-head .btn-primary {
+	background: var(--h-blue-500, #5083BC) !important;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-section.card-section {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .72), rgba(255, 255, 255, .28));
+	backdrop-filter: blur(18px) saturate(160%);
+	-webkit-backdrop-filter: blur(18px) saturate(160%);
+	border: 1px solid rgba(255, 255, 255, .7) !important;
+	border-radius: 20px !important;
+	box-shadow: 0 10px 26px rgba(29, 45, 68, .12), inset 0 1px 1px rgba(255, 255, 255, .85);
+	margin: 0 16px 14px;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-grid {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .72), rgba(255, 255, 255, .28));
+	backdrop-filter: blur(18px) saturate(160%);
+	-webkit-backdrop-filter: blur(18px) saturate(160%);
+	border: 1px solid rgba(255, 255, 255, .7);
+	border-radius: 20px;
+	overflow: hidden;
+	box-shadow: 0 10px 26px rgba(29, 45, 68, .12), inset 0 1px 1px rgba(255, 255, 255, .85);
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .grid-heading-row .data-row {
+	background: rgba(255, 255, 255, .35);
+	font-weight: 600;
+	font-size: 10.5px;
+	color: #8A8F95;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .grid-row .data-row {
+	border-bottom: 1px solid rgba(29, 45, 68, .06);
+	font-size: 12.5px;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .grid-row .data-row:hover {
+	background: rgba(255, 255, 255, .4);
+}
+
+/* 🔴 عطل حقيقي اتقاس (بلاغ المالك بلقطة: صف كامل فاضي كان بيبان
+ * وكأنه بيانات حقيقية). خلايا Currency/Float الفاضية بيعرض Frappe
+ * نفسه اسم الحقل كـplaceholder ("مدين"، "دائن") — القاعدة القديمة
+ * كانت بتلوّنهم بولد كحلي بارز زي أي رقم حقيقي فعلي، بلا تمييز.
+ * .h-cell-empty بيتحدد ديناميكيًا في horizon_form_layout.bundle.js
+ * (مقارنة نص .static-area بـtitle الخلية) ومُستثنى هنا صراحة. */
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .grid-row .col.grid-static-col[data-fieldtype="Currency"]:not(.h-cell-empty),
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .grid-row .col.grid-static-col[data-fieldtype="Float"]:not(.h-cell-empty) {
+	font-weight: 700;
+	color: #1D2D44;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .grid-row .col.grid-static-col.h-cell-empty {
+	font-weight: 400 !important;
+	color: #8A8F95 !important;
+}
+
+/*
+ * شاشة القائمة (List View) — عام على أي Doctype، بنفس منطق السكوب
+ * (كلاس عام لا اسم قائمة بعينه). .list-row-container مؤكَّد بفحص DOM
+ * حيّ إنه العنصر الحقيقي لكل صف قائمة.
+ */
+.list-row-container {
+	border-radius: 14px !important;
+	margin: 2px 8px;
+	transition: background .15s ease;
+}
+
+.list-row-container:hover {
+	background: rgba(255, 255, 255, .5) !important;
+}
+
+.list-row-container .list-row-col.list-subject a {
+	font-weight: 700;
+	color: var(--h-navy-600, #1D2D44);
+}
+
+/* غلاف زجاجي حوالين كل صفوف القائمة (١٦ أغسطس) — .frappe-list .result
+ * مؤكَّد بفحص DOM حيّ إنه الحاوية المباشرة لكل .list-row-container،
+ * خاص بشاشة القائمة بس (مش مشترك مع الفورم/سطح المكتب). */
+.frappe-list .result {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .72), rgba(255, 255, 255, .28));
+	backdrop-filter: blur(18px) saturate(160%);
+	-webkit-backdrop-filter: blur(18px) saturate(160%);
+	border: 1px solid rgba(255, 255, 255, .7);
+	border-radius: 22px;
+	padding: 8px;
+	box-shadow: 0 10px 26px rgba(29, 45, 68, .12), inset 0 1px 1px rgba(255, 255, 255, .85);
+}
+
+/*
+ * أيقونة ملوّنة لكل صف List View حسب الحالة (١٦ أغسطس) — CSS بحت،
+ * صفر JS. .indicator-pill الحقيقي في كل صف عنده كلاس لون فعلي
+ * (red/green/orange/gray...، مؤكَّد بفحص DOM حيّ على صف Sales Invoice
+ * حقيقي) — بنستغله مباشرة بـ:has() بدل ما نبني خريطة حالة↔لون بأنفسنا
+ * (اللي كان محتاج JS لكل صف، نفس فئة مخاطرة التوقيت اللي حصلت في
+ * صفحة المخازن). دايرة ملوّنة بسيطة بدل أيقونة SVG محدَّدة — مفيش
+ * ربط حقيقي بين نوع الـDoctype وأيقونة بعينها بلا بيانات إضافية، فمش
+ * هنخترع واحدة.
+ */
+.list-row-container .list-subject {
+	position: relative;
+	padding-right: 46px;
+}
+
+.list-row-container .list-subject::before {
+	content: "";
+	position: absolute;
+	right: 0;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 30px;
+	height: 30px;
+	border-radius: 10px;
+	background: var(--h-navy-400, #65799E);
+	opacity: .7;
+}
+
+.list-row-container:has(.indicator-pill.red) .list-subject::before,
+.list-row-container:has(.indicator-pill.pink) .list-subject::before {
+	background: #B04A3F;
+}
+
+.list-row-container:has(.indicator-pill.green) .list-subject::before,
+.list-row-container:has(.indicator-pill.cyan) .list-subject::before {
+	background: #4E7A5C;
+}
+
+.list-row-container:has(.indicator-pill.orange) .list-subject::before,
+.list-row-container:has(.indicator-pill.yellow) .list-subject::before {
+	background: #B8860B;
+}
+
+.list-row-container:has(.indicator-pill.blue) .list-subject::before,
+.list-row-container:has(.indicator-pill.light-blue) .list-subject::before {
+	background: var(--h-blue-500, #5083BC);
+}
+
+/*
+ * مرحلة ١ من خطة مطابقة horizon-journal-invoice-list-preview.html
+ * الحرفية (١٦ أغسطس) — تكبير مربّع الأيقونة لمقاس المرجع (٣٨×٣٨)،
+ * status-pill حقيقي بدل الشكل الافتراضي، ومبلغ بارز.
+ *
+ * عمود المبلغ اتحدَّد بـ`.list-row-col.text-right` — مؤكَّد بفحص DOM
+ * حيّ إن Frappe بيحطّ الكلاس ده تلقائيًا بس على أعمدة الحقول الرقمية
+ * (Currency)، بعكس عمود الاسم/الـID المجاور اللي مالوش نفس الكلاس —
+ * فرق حقيقي في الـDOM مش تخمين، وشغّال على أي دوكتايب بلا استهداف
+ * اسم حقل بعينه.
+ */
+.list-row-container .list-subject {
+	padding-right: 54px;
+}
+
+.list-row-container .list-subject::before {
+	width: 38px;
+	height: 38px;
+	border-radius: 12px;
+}
+
+.list-row-container .list-row-col.text-right {
+	font-size: 13px;
+	font-weight: 800;
+	color: var(--h-navy-600, #1D2D44);
+}
+
+.list-row-container .indicator-pill {
+	font-size: 10px !important;
+	font-weight: 700 !important;
+	padding: 4px 10px !important;
+	border-radius: 20px !important;
+	background: rgba(101, 121, 158, .14) !important;
+	color: var(--h-navy-400, #65799E) !important;
+}
+
+.list-row-container:has(.indicator-pill.red) .indicator-pill,
+.list-row-container:has(.indicator-pill.pink) .indicator-pill {
+	background: #F4E2DF !important;
+	color: #B04A3F !important;
+}
+
+.list-row-container:has(.indicator-pill.green) .indicator-pill,
+.list-row-container:has(.indicator-pill.cyan) .indicator-pill {
+	background: #E4EEE7 !important;
+	color: #4E7A5C !important;
+}
+
+.list-row-container:has(.indicator-pill.orange) .indicator-pill,
+.list-row-container:has(.indicator-pill.yellow) .indicator-pill {
+	background: #FBF0DC !important;
+	color: #B8860B !important;
+}
+
+.list-row-container:has(.indicator-pill.blue) .indicator-pill,
+.list-row-container:has(.indicator-pill.light-blue) .indicator-pill {
+	background: var(--h-blue-soft, #E8EFF7) !important;
+	color: var(--h-blue-500, #5083BC) !important;
+}
+
+/* تكبير المسافات والصف بالكامل — بطلب صريح بعد صورة حقيقية من المرجع
+ * (IMG_3011) أوضحت إن التباعد الافتراضي الضيّق في Frappe بعيد عن
+ * المطلوب. أرقام أكبر من قيم الملف المرجعي الحرفية نفسها (١٣px) —
+ * الصورة الحقيقية اللي وافق عليها المالك بصريًا أوسع بكتير، وهي
+ * المرجع الفعلي دلوقتي. */
+.list-row-container {
+	margin: 8px 8px !important;
+}
+
+.list-row-container .list-row {
+	padding: 22px 18px !important;
+}
+
+.list-row-container .list-subject {
+	padding-right: 0;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.list-row-container .list-subject::before {
+	content: none;
+	display: none;
+}
+
+.list-row-container .list-row-col.text-right {
+	font-size: 15px;
+}
+
+.list-row-container .indicator-pill {
+	font-size: 11px !important;
+	padding: 6px 14px !important;
+}
+
+/* اسم العميل + رقم المستند + التاريخ في خلية واحدة (زي .list-title/
+ * .list-sub في المرجع) — عبر horizon_list_layout.bundle.js. البيانات
+ * حقيقية بالكامل (منقولة من نفس الصف، مش مخترَعة)، عمود الـID الأصلي
+ * بيتخفى بعد الدمج عشان مايتكرّرش. */
+.h-list-text {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.h-list-sub {
+	font-size: 11px;
+	color: var(--h-navy-400, #8A8F95);
+	margin-top: 2px;
+	font-weight: 400;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.h-id-column-merged {
+	display: none !important;
+}
+
+/* 🔴 بلاغ المالك (لقطة موبايل، دائرتان): رقم الفاتورة مقصوص جدًا،
+ * والفراغ يمين الصف (.level-right) بلا فايدة. مؤكَّد بفحص أبعاد حيّ:
+ * .level-left عندها flex:4 1 0% (عرض فعلي ١٤٨px) و.level-right عندها
+ * flex:1 1 0% (عرض فعلي ٥٤px) رغم إن محتواها الظاهر فعليًا على
+ * الموبايل بس بادج الحالة (النشاط الحقيقي hidden-xs من Frappe نفسه).
+ * القرار (AskUserQuestion، اختيار متعدد): .level-right تاخد حجم
+ * محتواها الفعلي بدل التمدد الفاضي، و.level-left تاخد الباقي. */
+/* 🔴 تصحيح ثالث بعد قياس فعلي: المساحة الكلية للصف على الموبايل
+ * ضيقة جدًا (١٨٥px بعد الـpadding) — أي عمود منفصل يمين الصف
+ * (.level-right) بمحتوى إضافي (بادج + مبلغ) بيسرق مساحة كافية تخلي
+ * اسم العميل يختفي تمامًا (قِستها فعليًا: عرض ٠px، مش تخمين). الحل
+ * الصحيح: .level-right ترجع لبادج الحالة وحدها بحجمها الطبيعي
+ * الصغير، والمبلغ الإجمالي بينضم للسطر تحت الاسم (h-list-sub) بجانب
+ * رقم الفاتورة بدل عمود يزاحم مساحته — نفس نمط الدمج المستخدم بالفعل
+ * لرقم الفاتورة والوقت. */
+.list-row-container .level-left {
+	flex: 1 1 0% !important;
+	min-width: 0 !important;
+}
+
+.list-row-container .level-right {
+	flex: 0 0 auto !important;
+}
+
+/* 🔴 طلب صريح: مساحة مهدرة بجوار مربع الاختيار — مؤكَّد بفحص حيّ:
+ * .select-like عرضها ٤٠px بينما الـcheckbox نفسه ١٤px بس (٢٢٪ من
+ * مساحة الصف الكلية ١٨٥px على الموبايل!). السبب: padding داخلي
+ * (11px يمين) + margin-left ١٥px على الـcheckbox نفسها + margin-left
+ * ١٥px إضافي على .list-subject بعدها — ثلاث مسافات متراكمة لعنصر
+ * صغير. تقليصها بيرجّع مساحة حقيقية لاسم العميل ورقم الفاتورة. */
+/* 🔴 طلب صريح: المسافة قبل مربع الاختيار (يمين الصف، RTL) كبيرة —
+ * مؤكَّد بفحص حيّ: من حافة الصف الفعلية لحافة مربع الاختيار ٢٢px
+ * (padding-right لـ.list-row وحدها ١٨px من إجمالي ٢٢px). تقليصها على
+ * الموبايل بس. */
+/* 🔴 تصحيح ثانٍ (طلب صريح بلقطة بدائرتين): المسافة لسه واسعة بنظر
+ * المالك — تضييق إضافي من ١٠px لـ٦px.
+ * 🔴 درس مهم اتكشف بالقياس: أداة البناء بتولّد نسخة css-rtl منفصلة
+ * (وهي المُحمَّلة فعليًا لأن الموقع عربي بالكامل — مؤكَّد بفحص
+ * `<link>` الفعلي في الصفحة الحية) بتعمل قلب تلقائي كامل لـ
+ * margin-right/padding-right إلى margin-left/padding-left. أول
+ * محاولة كتبت "padding-right" مباشرة فانقلبت لليسار في النسخة
+ * المُحمَّلة فعليًا — صفر تأثير على الجانب المقصود. الحل: نكتب
+ * "left" في المصدر عشان تنعكس RTL لـ"right" الفعلي — مؤكَّد بفحص
+ * نسخة css-rtl المبنية بعد التعديل، لا افتراضًا. */
+@media (max-width: 480px) {
+	.list-row-container .list-row {
+		padding-left: 6px !important;
+	}
+}
+
+.list-row-container .select-like {
+	padding: 10px 4px 10px 0 !important;
+}
+
+/* 🔴 محاذاة رأس الجدول مع صفوف البيانات (بلاغ بدائرتين، مؤكَّد بفحص
+ * إحداثيات حيّ): مربع اختيار رأس الجدول (.list-check-all جوّه
+ * .list-row-head) على استقامة مختلفة تمامًا عن كل صفوف البيانات —
+ * قِست بالأرقام: right=329px للرأس مقابل right=306px لكل الصفوف
+ * بلا استثناء (فرق ٢٣px بالضبط). السبب: .list-row-head عندها
+ * padding-right:0 لكن .list-check-all نفسها عندها margin-right:11px
+ * منفصلة — عنصر مختلف تمامًا عن .select-like المستخدَمة في الصفوف،
+ * فتعديلاتنا السابقة على .select-like ما أثّرتش عليها. القيمة هنا
+ * مبنية على الفرق المقاس، وتُتحقَّق بإعادة القياس بعد البناء لا
+ * افتراضًا. */
+@media (max-width: 480px) {
+	.list-row-head .list-header-subject .list-check-all {
+		margin-left: 22px !important;
+	}
+}
+
+.list-row-container .list-row-checkbox {
+	margin-left: 4px !important;
+}
+
+.list-row-container .list-subject {
+	margin-left: 4px !important;
+}
+
+.h-list-sub {
+	max-width: none;
+}
+
+/* بادج الحالة بحجم نصّها الفعلي — لا عرض ثابت موروث من حاوية أوسع. */
+/* 🔴 طلب صريح: بادج الحالة تاخد مساحة بالنص الكامل ("متأخر"، "مؤقت")
+ * — على الموبايل يكفي مؤشر لوني (دائرة صغيرة) بدل النص، نفس فكرة
+ * indicator dot الأصلية في Frappe لكن بلون المرجع الفعلي بدل الرمادي
+ * الافتراضي. النص لسه موجود فعليًا (title attribute) لمن يحتاج
+ * التفاصيل بالضغط المطوّل، بس مش معروض بصريًا. */
+@media (max-width: 480px) {
+	.list-row-container .level-item.visible-xs .indicator-pill {
+		width: 12px !important;
+		height: 12px !important;
+		padding: 0 !important;
+		border-radius: 50% !important;
+		overflow: hidden;
+		background: currentColor !important;
+	}
+
+	.list-row-container .level-item.visible-xs .indicator-pill .ellipsis {
+		display: none;
+	}
+}
+
+.list-row-container .level-item.visible-xs {
+	width: auto !important;
+}
+
+/* المبلغ الإجمالي (منقول من عمود مخفي حقيقي عبر horizon_list_layout.bundle.js)
+ * بدل الفراغ أسفل بادج الحالة مباشرة. */
+
+
+/* الأيقونة الحقيقية (SVG من sprite فرابي نفسه) — بديل المربّع
+ * الفاضي/الإيموجي بعد ما اتأكَّد إن السيرفر بلا أي خط إيموجي مثبَّت
+ * (fc-list = DejaVu بس)، فأي content إيموجي كان بيترسم tofu وحش.
+ * frappe.utils.icon() مش عليه ده الاعتماد — SVG حقيقي دايمًا. */
+.h-list-icon {
+	width: 48px;
+	height: 48px;
+	border-radius: 14px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+	background: var(--h-navy-400, #65799E);
+}
+
+.h-list-icon svg {
+	width: 20px;
+	height: 20px;
+	color: #fff;
+	fill: #fff;
+}
+
+/* 🔴 استكمال طلب المالك: بعد ما اتشالت المساحة المهدرة حوالين مربع
+ * الاختيار، أكبر عنصر ثابت متبقٍ على الموبايل هو هذه الأيقونة نفسها
+ * (٤٨px من أصل ١٨٥px مساحة الصف الكاملة — ٢٦٪). تصغيرها على الموبايل
+ * تحديدًا (مش الديسكتوب) بيرجّع مساحة حقيقية إضافية للاسم ورقم
+ * الفاتورة. */
+@media (max-width: 480px) {
+	.h-list-icon {
+		width: 32px;
+		height: 32px;
+		border-radius: 10px;
+	}
+
+	.h-list-icon svg {
+		width: 14px;
+		height: 14px;
+	}
+}
+
+.list-row-container:has(.indicator-pill.red) .h-list-icon,
+.list-row-container:has(.indicator-pill.pink) .h-list-icon {
+	background: #B04A3F;
+}
+
+.list-row-container:has(.indicator-pill.green) .h-list-icon,
+.list-row-container:has(.indicator-pill.cyan) .h-list-icon {
+	background: #4E7A5C;
+}
+
+.list-row-container:has(.indicator-pill.orange) .h-list-icon,
+.list-row-container:has(.indicator-pill.yellow) .h-list-icon {
+	background: #B8860B;
+}
+
+.list-row-container:has(.indicator-pill.blue) .h-list-icon,
+.list-row-container:has(.indicator-pill.light-blue) .h-list-icon {
+	background: var(--h-blue-500, #5083BC);
+}
+
+/* اسم المستند الحقيقي تحت العنوان — عنصر Frappe الأصلي (.sub-heading)
+ * اتفعّل ببيانات حقيقية عبر horizon_form_layout.bundle.js. */
+.page-container:is(.editable-form, .submitted-form, .cancelled-form, [data-page-route^="List/"]) .page-head .sub-heading {
+	color: rgba(255, 255, 255, .55) !important;
+	font-size: 11px;
+	margin-top: 2px;
+}
+
+/* شارة حالة المستند (زي "متأخر") في الرأس — بألوان المرجع الحرفية
+ * الحقيقية (--approved/--rejected/--pending) بدل ألوان Frappe
+ * الافتراضية (كانت pink فاتح + أحمر مختلف قليلاً عن #B04A3F). نفس
+ * خرائط :has() المستخدَمة في القائمة بالحرف — قرار سابق "ماتتلمسش"
+ * اتلغى بطلب صريح "طبّق ألوان المرجع". */
+.page-container:is(.editable-form, .submitted-form, .cancelled-form, [data-page-route^="List/"]) .page-head .indicator-pill {
+	border-radius: 20px !important;
+}
+
+.page-head:has(.indicator-pill.red) .indicator-pill,
+.page-head:has(.indicator-pill.pink) .indicator-pill {
+	background: #F4E2DF !important;
+	color: #B04A3F !important;
+}
+
+.page-head:has(.indicator-pill.green) .indicator-pill,
+.page-head:has(.indicator-pill.cyan) .indicator-pill {
+	background: #E4EEE7 !important;
+	color: #4E7A5C !important;
+}
+
+.page-head:has(.indicator-pill.orange) .indicator-pill,
+.page-head:has(.indicator-pill.yellow) .indicator-pill {
+	background: #FBF0DC !important;
+	color: #B8860B !important;
+}
+
+.page-head:has(.indicator-pill.blue) .indicator-pill,
+.page-head:has(.indicator-pill.light-blue) .indicator-pill {
+	background: var(--h-blue-soft, #E8EFF7) !important;
+	color: var(--h-blue-500, #5083BC) !important;
+}
+
+.page-head:has(.indicator-pill.gray) .indicator-pill,
+.page-head:has(.indicator-pill.grey) .indicator-pill,
+.page-head:has(.indicator-pill.darkgrey) .indicator-pill {
+	background: rgba(255, 255, 255, .16) !important;
+	color: rgba(255, 255, 255, .75) !important;
+}
+
+/* مرحلة ٣ (نهج ثانٍ) — حقول أساسية مُبرَزة بالاسم لكل دوكتايب
+ * (علامة .h-meta-field من horizon_form_layout.bundle.js). صفر لمس
+ * لتخطيط .form-column/.form-section الأصلي — تنسيق بصري هادئ على
+ * الحقل المحدَّد نفسه بس (بلا صندوق إدخال، تسمية صغيرة مكتومة + قيمة
+ * بولد كحلي)، بديل آمن عن التجربة الأولى (grid عام على القسم كامل)
+ * اللي كسرت توزيع حقول فاتورة المبيعات. */
+.h-meta-field .control-label {
+	font-size: 10.5px !important;
+	color: #8A8F95 !important;
+	font-weight: 400 !important;
+}
+
+.h-meta-field .control-value {
+	font-size: 14px;
+	font-weight: 700;
+	color: #1D2D44;
+}
+
+.h-meta-field .control-input {
+	border-bottom: 1.5px solid rgba(29, 45, 68, 0.12);
+	padding-bottom: 3px;
+}
+
+.h-meta-field .control-input input,
+.h-meta-field .control-input select,
+.h-meta-field .control-input .awesomplete input {
+	border: none !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	font-weight: 700;
+	font-size: 14px;
+	color: #1D2D44;
+	padding-left: 0 !important;
+}
+
+/* 🔴 عطل حقيقي اتقاس اليوم: فيضان أفقي ٣٨px عند قياس ٧٦٨px بالظبط في
+ * شاشة الفورم (scrollWidth=791 على clientWidth=753). المسبِّب مؤكَّد
+ * بفحص DOM حيّ (getBoundingClientRect): `.form-sidebar` — الشريط
+ * الجانبي الأصلي لـFrappe (كلف إلى/مرفقات/بطاقات/مشاركة)، مش من أي
+ * قاعدة في هذا الملف (مؤكَّد بالبحث — الملف لا يلمس .form-sidebar
+ * إطلاقًا). كلاسه الأصلي `hidden-xs hidden-sm` مفروض يخفيه على
+ * الشاشات الصغيرة لكنه ظهر فعليًا عند ٧٦٨px بالقياس المباشر — إصلاح
+ * صريح بدل الاعتماد على breakpoint بوتستراب الأصلي. */
+@media (max-width: 768px) {
+	.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-sidebar {
+		display: none !important;
+	}
+}
+
+/* 🔴 فيضان تانٍ اتكشف بعد الإصلاح السابق (نفس الـ٣٨px، مسبِّب مختلف):
+ * محاولة أولى بـ`width:100% !important` فشلت — السبب الحقيقي (مؤكَّد
+ * بفحص getComputedStyle) قاعدتان أصليتان من Frappe نفسه (desk.bundle.css،
+ * لا من هذا الملف): `.form-grid { min-width: 738px }` و
+ * `.form-grid-container .form-grid { min-width: 738px }` — رقم ثابت
+ * بالبكسل بلا `!important`. الحل الأول (min-width:0) كان بيمنع
+ * الفيضان بالكامل، لكن بلاغ لاحق من المالك (لقطة حقيقية من جهازه):
+ * جدول الأصناف غلط، محتاج تمرير جانبي — القص كان بلا أي طريقة
+ * وصول للعمود الأخير. السبب الحقيقي لعدم التمرير: `.form-grid-container`
+ * (الأب المباشر لـ.form-grid، مؤكَّد بفحص DOM حيّ) عندها من Frappe
+ * نفسه `overflow-x: clip` — أقوى من hidden، بيمنع أي تمرير حتى لو
+ * الحاوية الداخلية فايضة. الإصلاح الصحيح: overflow-x:auto على
+ * form-grid-container (فيبان سكرول حقيقي)، وإلغاء min-width:0 القديمة
+ * عن form-grid/صفوفها (تفضل بعرضها الطبيعي أو ١٠٠٪ أيهما أكبر) — لو
+ * المحتوى أعرض من الشاشة بيفيض *داخل* الحاوية القابلة للتمرير، مش
+ * عن حدود الصفحة كلها. */
+@media (max-width: 768px) {
+	.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-grid-container {
+		overflow-x: auto !important;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-grid,
+	.page-container:is(.editable-form, .submitted-form, .cancelled-form) .grid-heading-row,
+	.page-container:is(.editable-form, .submitted-form, .cancelled-form) .grid-row {
+		min-width: 100%;
+		width: max-content;
+	}
+}
+
+/* 🔴 عطل الليجند المؤجَّل (نص "نفقة"/"صافي الربح" مبعثر الحروف على
+ * جهاز المالك الحقيقي): chromium headless هنا رسم النص سليمًا، فمقدرش
+ * أعيد إنتاج العطل مباشرة (مسجَّل كحدّ للتحقّق — القياس هنا لا يكشف
+ * العطل نفسه). لكن فحص getComputedStyle كشف فرقًا حقيقيًا: عنوان
+ * الودجت العربي (HTML) بيرث font-family يبدأ بـCairo، بينما نص
+ * الليجند (داخل SVG، مرسوم بمكتبة الرسم البياني مباشرة) بلا Cairo
+ * إطلاقًا — قائمة fallback عامة بس. "حروف منفصلة جنب بعض" توقيع فشل
+ * تشكيل عربي سياقي (مش bidi — لو كان اتجاه، كان هيبان هنا كمان لأن
+ * خوارزمية bidi مش مرتبطة بالخط). الإصلاح: فرض نفس سلسلة الخط على
+ * نص SVG — بلا لمس direction/text-anchor (خطر حقيقي: text-anchor
+ * "start" بيتقلب لليمين مع rtl ويكسر رسومًا بيانية تانية بالكامل
+ * لاتينية). يحتاج تأكيد نهائي بلقطة من جهاز المالك بعد النشر. */
+.chart-container svg text {
+	font-family: Cairo, InterVariable, Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+}
+
+/* 🔴 عطل حقيقي اتقاس على جهاز المالك الحقيقي (لقطة موبايل فعلية):
+ * `.h-rail` (شريط التنقل الرأسي، ٦٨px، `position:fixed`) بلا أي
+ * إزاحة معوِّضة على المحتوى — `#main-section` (الحاوية الشقيقة
+ * المباشرة له، تحوي navbar وكل صفحات desk) كانت بادية من left:0
+ * بعرض الشاشة الكامل (مؤكَّد بفحص getBoundingClientRect). على
+ * الديسكتوب الفرق غير ملحوظ لأن خلفية الرايل الصلبة (z-index:1000)
+ * بتغطي أي جزء من المحتوى يقع تحتها، فيبدو الشكل سليمًا رغم التراكب
+ * الفعلي. على الموبايل الضيق (٣٩٠px) العرض المتاح أقل فبتظهر تابات
+ * الفورم مقطوعة خلف الرايل فعليًا — نفس الصورة اللي بعتها المالك.
+ * الإصلاح: نفس نمط `.h-desktop-launcher` أعلاه (`right: 68px` في
+ * المصدر يتحوّل تلقائيًا لـ`left` الصحيحة بعد بناء نسخة RTL). */
+.main-section {
+	/* 🔴 الفراغ الأبيض جوّه الموديولات على iOS (بلاغ المالك، مقيس بمحاكاة
+	 * iPhone): .main-section هي حاوية التمرير الفعلية (height=viewport،
+	 * overflow-y:auto)، بينما الخلفية الكحلي كانت على body بـ
+	 * background-attachment:fixed — وiOS لا يدعم fixed background فتنربط
+	 * بصندوق body لا بالمحتوى المتمرِّر، فيظهر أبيض تحت المحتوى القصير.
+	 * الحل: الخلفية على حاوية التمرير نفسها فتغطّي المحتوى كاملًا بلا fixed. */
+	background:
+		radial-gradient(circle at 22% 16%, #CBD8EA 0%, transparent 60%),
+		radial-gradient(circle at 82% 88%, #D6E0EF 0%, transparent 54%),
+		#F1F4F9;
+}
+
+/* قسم النشاط والتعليقات (`.form-footer`) — كان بلا أي تنسيق (شكله
+ * الافتراضي الرمادي القديم، مؤكَّد بلقطة حقيقية من جهاز المالك: نص
+ * خام بلا بطاقة زجاجية ولا تمييز بصري). نفس نمط `.form-section.card-section`
+ * أعلاه — بطاقة زجاجية واحدة تحوي التعليقات والنشاط معًا. */
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-footer {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .72), rgba(255, 255, 255, .28));
+	backdrop-filter: blur(18px) saturate(160%);
+	-webkit-backdrop-filter: blur(18px) saturate(160%);
+	border: 1px solid rgba(255, 255, 255, .7);
+	border-radius: 20px;
+	box-shadow: 0 10px 26px rgba(29, 45, 68, .12), inset 0 1px 1px rgba(255, 255, 255, .85);
+	margin: 0 16px 14px;
+	padding: 16px 18px;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-footer .comment-input-header span,
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-footer .timeline-item.activity-title h4 {
+	font-weight: 700;
+	color: #1D2D44;
+	font-size: 13px;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-footer .timeline-dot {
+	background: var(--h-blue-500, #5083BC);
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-footer .timeline-content {
+	font-size: 12.5px;
+	color: #3A4457;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-footer .timeline-content a {
+	color: #1D2D44;
+	font-weight: 600;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-footer .frappe-timestamp {
+	color: #8A8F95;
+	font-size: 11px;
+}
+
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .form-footer .timeline-item {
+	border-bottom: 1px solid rgba(29, 45, 68, .06);
+	padding: 8px 0;
+}
+
+/* حقول الإدخال — كانت صغيرة الارتفاع (٢٨px قياس فعلي)، طلب صريح من
+ * المالك بعد لقطة حقيقية من جهازه: زيادة الارتفاع ٢٠٪ (padding رأسي
+ * أكبر بدل height صريحة — يحافظ على توسيط النص تلقائيًا) وخط متناسق
+ * (١٤px ← ١٥px، زيادة معتدلة تناسب الحقل الأكبر بلا ثقل بصري زائد). */
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .control-input input.form-control,
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .control-input select.form-control,
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .control-input .awesomplete input.form-control {
+	padding: 9px 12px;
+	font-size: 15px;
+}
+
+/* 🔴 قص رأسي في قيمة الـselect (تقرير مراجعة ٢٤ أغسطس، بند ١):
+ * الـpadding أعلاه مناسب للـinput لكن select له ارتفاع UA ثابت
+ * فالنص بينقص من فوق. height:auto + min-height تفك القص وتحافظ
+ * على نفس الارتفاع البصري للحقول المجاورة. خصائص رأسية — لا يمسها
+ * قلب RTL. */
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .control-input select.form-control {
+	height: auto;
+	min-height: 44px;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	line-height: 1.7;
+}
+
+/* توحيد باقي عناصر الإدخال على نفس الهوية والنعومة (طلب المالك:
+ * «تحدث كل الحقول حسب تصميم الهوية ونفس النعومة») — نفس عائلة
+ * الحقول في كل شاشات النظام لأنها عناصر فرابي المشتركة. */
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .control-input textarea.form-control {
+	padding: 9px 12px;
+	font-size: 15px;
+	line-height: 1.8;
+	min-height: 88px;
+}
+input.form-control,
+select.form-control,
+textarea.form-control {
+	transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+}
+select.form-control:focus,
+textarea.form-control:focus {
+	border-color: var(--h-navy-600, #1D2D44);
+	box-shadow: 0 0 0 4px rgba(29, 45, 68, .08);
+}
+
+/* مربعات الاختيار كانت بمقاس المتصفح الافتراضي (~14px) — هدف لمس
+ * صغير على الجوال (تقرير المراجعة، بند ٦). accent-color يصبغها
+ * بالكحلي بدل أزرق المتصفح. */
+.frappe-control input[type="checkbox"] {
+	width: 18px;
+	height: 18px;
+	accent-color: var(--h-navy-600, #1D2D44);
+}
+
+/* شريط تابات الفورم (تفاصيل/معلومات أخرى) كان بوتستراب خام وسط
+ * هوية كاملة (تقرير المراجعة، بند ٨). */
+.form-tabs-list .nav-link {
+	font-weight: 700;
+	color: #4A5361;
+	transition: color .2s ease, border-color .2s ease;
+}
+.form-tabs-list .nav-link.active {
+	color: var(--h-navy-600, #1D2D44);
+	border-bottom: 2px solid var(--h-navy-600, #1D2D44);
+}
+
+/* أيقونة القائمة كانت ٤٨×٤٨px ثابتة على كل الأحجام — بلاغ المالك
+ * بلقطة حقيقية: "كبيرة جدًا على الجوال". على عرض ضيق نسبة الأيقونة
+ * لعرض الصف بتكبر كتير. تصغير معتدل على الموبايل بس. */
+@media (max-width: 480px) {
+	.h-list-icon {
+		width: 34px;
+		height: 34px;
+		border-radius: 10px;
+	}
+
+	.h-list-icon svg {
+		width: 15px;
+		height: 15px;
+	}
+}
+
+/* قائمة الفلاتر السريعة (.filter-selector) — بلاغ المالك: "قديمة
+ * حدثها مع الهوية". كانت بلا أي تنسيق (خلفية رمادية مسطحة، بلا
+ * حدود ولا ظل). نفس نمط البطاقة الزجاجية المستخدَم في كل مكان تاني. */
+.filter-selector {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .75));
+	backdrop-filter: blur(18px) saturate(160%);
+	-webkit-backdrop-filter: blur(18px) saturate(160%);
+	border: 1px solid rgba(255, 255, 255, .7) !important;
+	border-radius: 16px !important;
+	box-shadow: 0 10px 26px rgba(29, 45, 68, .16), inset 0 1px 1px rgba(255, 255, 255, .85);
+	padding: 8px !important;
+}
+
+.filter-selector .form-group.frappe-control {
+	margin-bottom: 6px;
+}
+
+.filter-selector .filter-button {
+	border-radius: 10px !important;
+	font-weight: 600;
+}
+
+/* 🔴 عطل حقيقي اتقاس (بلاغ المالك بلقطة: فراغ كبير مش مفهوم بعد
+ * نهاية الاختصارات، قبل REPORTS & MASTERS). فحص DOM حيّ:
+ * .codex-editor__redactor (حاوية محرر Editor.js الأصلية لصفحة
+ * Workspace) عندها height=3315px صريحة، بينما آخر عنصر فعلي فيها
+ * بينتهي عند 2135px — فراغ ١١٨٠px فاضي بالكامل. سلوك Editor.js
+ * الافتراضي: مساحة نقر فاضية أسفل المحرر لتسهيل إضافة بلوكات جديدة
+ * (منطقي في وضع التحرير النشط، غير مبرر في وضع العرض العادي). */
+.codex-editor__redactor {
+	height: auto !important;
+	min-height: 0 !important;
+	padding-bottom: 24px !important;
+}
+
+/* 🔴 بلاغ المالك بلقطة: "الغي الامتداد الخاص بالأزرار، شكله عجيب" —
+ * .grid-footer (حاوية زرّي "إضافة متعددة"/Add Row) عندها خلفية بيضاء
+ * صلبة بعرض الجدول بالكامل (١١٨٤px مؤكَّد بفحص حيّ) بينما الأزرار
+ * نفسها (.grid-buttons) عرضها ١٧٤px بس — شريط أبيض فاضي طويل غريب
+ * الشكل. الخلفية الصلبة هي المشكلة البصرية، مش عرض الحاوية نفسه
+ * (له غرض تخطيطي من Frappe) — إلغاؤها كافٍ ليندمج مع خلفية الجدول
+ * الزجاجية. */
+.page-container:is(.editable-form, .submitted-form, .cancelled-form) .grid-footer {
+	background: transparent !important;
+}
+
+/* 🔴 مراجعة تصميم شاملة (١٦ أغسطس، بند ١): الفلاتر السريعة فوق
+ * الجدول (.standard-filter-section) وقائمة الفرز المنسدلة
+ * (.sort-selector) لسه بشكلهم الافتراضي بالكامل — مؤكَّد بفحص
+ * outerHTML حيّ إنهم عنصر منفصل تمامًا عن .filter-selector (الشريط
+ * الجانبي المتقدم، اتظبط في كوميت سابق) بسيلكتور مختلف كليًا. نفس
+ * نمط البطاقة الزجاجية بالحرف. */
+.standard-filter-section {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .75));
+	backdrop-filter: blur(18px) saturate(160%);
+	-webkit-backdrop-filter: blur(18px) saturate(160%);
+	border: 1px solid rgba(255, 255, 255, .7) !important;
+	border-radius: 16px !important;
+	box-shadow: 0 10px 26px rgba(29, 45, 68, .16), inset 0 1px 1px rgba(255, 255, 255, .85);
+	padding: 10px 12px !important;
+	gap: 8px;
+}
+
+.standard-filter-section .form-group.frappe-control {
+	margin-bottom: 0;
+}
+
+.standard-filter-section .form-control {
+	border-radius: 10px !important;
+	background: rgba(255, 255, 255, .7) !important;
+}
+
+.sort-selector .dropdown-menu,
+.page-form .dropdown-menu {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .96), rgba(255, 255, 255, .9)) !important;
+	backdrop-filter: blur(18px) saturate(160%);
+	-webkit-backdrop-filter: blur(18px) saturate(160%);
+	border: 1px solid rgba(255, 255, 255, .7) !important;
+	border-radius: 14px !important;
+	box-shadow: 0 10px 26px rgba(29, 45, 68, .16) !important;
+	padding: 6px !important;
+}
+
+.sort-selector .dropdown-item {
+	border-radius: 8px;
+}
+
+/* 🔴 مراجعة تالية (١٦ أغسطس، بلاغ ثانٍ بلقطة موبايل حقيقية): القاعدة
+ * أعلاه كانت بتضبط الزوايا بس من غير أي خلفية — زرّ "آخر تحديث يوم"
+ * وسهم الترتيب وزرّ الفلتر وزرّ X (مسح الفلاتر) الأربعة فضلوا
+ * `btn btn-default` الرمادي الافتراضي (`rgb(223,224,219)`، مؤكَّد
+ * بفحص outerHTML حيّ لـ.filter-section كاملة). نفس نمط الحقول في
+ * .standard-filter-section المجاورة لهم مباشرة. */
+.filter-section .btn.btn-default {
+	background: rgba(255, 255, 255, .7) !important;
+	border: 1px solid rgba(255, 255, 255, .5) !important;
+	color: var(--h-navy-600, #1D2D44) !important;
+	border-radius: 10px !important;
+}
+
+.filter-section .btn.btn-default svg use {
+	fill: var(--h-navy-600, #1D2D44);
+}
+
+/* 🔴 المصدر الحقيقي للرمادي المتبقي خلف "آخر تحديث يوم" (بلاغ ثالث،
+ * نفس اللقطة): مش الأزرار ولا حاوياتها المباشرة (فحصتها فرادى، كلها
+ * شفافة) — `.page-form` نفسها (الأب المشترك لـ.standard-filter-section
+ * و.filter-section مع بعض) عندها خلفية Frappe الصلبة
+ * `rgb(223,224,219)` (مؤكَّد بفحص computed style حيّ)، وبتبان في
+ * الفراغ/الـgap بين الكارتين. نفس عطل `.form-page` في صفحة الفورم
+ * (أعلاه، سطر ١٠٩٥) بنفس السبب بالضبط. */
+/* 🔴 تعديل (طلب صريح): الشفافية الكاملة السابقة سابت المنطقة فاضية
+ * بصريًا بدل ما تتسق مع بقية البطاقات الزجاجية حواليها. زجاج خفيف
+ * (شفافية أعلى وblur أقل من .standard-filter-section الداخلية عمدًا)
+ * — عشان .page-form حاوية خارجية بتجمع كارتين زجاجيين جواها، مش
+ * محتاجة نفس القوة وإلا التأثير يتكرر ويبان مزدحم. */
+/* 🔴 تصحيح ثانٍ (المالك: "الخلفية مش زجاج، باينة رمادي اللون"):
+ * القيم "الخفيفة" السابقة (.55/.35 + blur ١٠px) فقدت طابع الزجاج
+ * وبانت طبقة بيضاء معتمة فوق تدرّج الـbody الملوّن — إحساسها رمادي لا
+ * لامع. الحل: نفس قوة الزجاج بالحرف المستخدمة في
+ * .standard-filter-section (blur ١٨px + saturate ١٦٠٪) بدل نسخة أضعف،
+ * بلا border/box-shadow خاصّين بيها (سيبتهم للكروت الداخلية فقط) —
+ * تفاديًا لتكرار الحدود، مع نفس قوة اللمعان الحقيقي. */
+.page-form {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .78), rgba(255, 255, 255, .55)) !important;
+	backdrop-filter: blur(18px) saturate(160%);
+	-webkit-backdrop-filter: blur(18px) saturate(160%);
+	border-radius: 16px !important;
+}
+
+/* 🔴 مراجعة تصميم شاملة (بند ١، تصحيح إضافي): الشريط الجانبي الحقيقي
+ * لشاشة القائمة (.list-sidebar — فرز بواسطة/كلف إلى/منشئه بواسطة/
+ * بطاقات/Save Filter) اتضح إنه عنصر مختلف تمامًا عن .filter-selector
+ * اللي اتصلح سابقًا (مؤكَّد بفحص DOM حيّ: chain كامل من fromفرز بواسطة
+ * لغاية .list-sidebar.overlay-sidebar). كان لسه بشكله الافتراضي
+ * بالكامل رغم التصنيف الأول في التقرير. */
+.list-sidebar {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .88), rgba(255, 255, 255, .72));
+	backdrop-filter: blur(18px) saturate(160%);
+	-webkit-backdrop-filter: blur(18px) saturate(160%);
+	border: 1px solid rgba(255, 255, 255, .7);
+	border-radius: 16px;
+	box-shadow: 0 10px 26px rgba(29, 45, 68, .12), inset 0 1px 1px rgba(255, 255, 255, .85);
+	padding: 12px 8px;
+}
+
+.list-sidebar .sidebar-label {
+	font-size: 10.5px;
+	font-weight: 700;
+	color: #8A8F95;
+	text-transform: none;
+	padding: 6px 10px 2px;
+}
+
+.list-sidebar .list-sidebar-button {
+	border-radius: 10px !important;
+	background: transparent !important;
+	border: none !important;
+	font-weight: 500;
+}
+
+.list-sidebar .list-sidebar-button:hover {
+	background: rgba(80, 131, 188, .1) !important;
+}
+
+.list-sidebar input.form-control,
+.list-sidebar .list-tags input {
+	border-radius: 10px !important;
+	background: rgba(255, 255, 255, .7) !important;
+}
+
+.list-sidebar .sidebar-action a {
+	color: #5083BC;
+	font-weight: 600;
+}
+
+/* 🔴 مراجعة تصميم شاملة (بند ٢): عنوان القائمة يُقطع على الموبايل
+ * ("القيود ال..." بدل "القيود اليومية"). السبب من Frappe نفسه —
+ * .title-text عندها max-width:25vw (مؤكَّد بفحص desk.bundle.css)، وعلى
+ * عرض ٣٩٠px ده يساوي ٩٧.٥px بالظبط، بينما النص الفعلي محتاج ١٢٨px
+ * (scrollWidth مؤكَّد بفحص حيّ). العنصر الأب (.title-area) عنده مساحة
+ * أوسع (~١٣٦px) متاحة فعليًا ومش مستغَلة. min() بتضمن التوسّع بلا
+ * فيضان عن الحاوية حتى على شاشات أضيق من ٣٩٠px. */
+/* 🔴 محاولة أولى استخدمت min(70vw, 220px) — القاعدة اختفت بصمت من
+ * الملف المبني بلا أي تحذير أو خطأ ظاهر (مؤكَّد: grep على الملف
+ * النهائي رجع صفر نتيجة رغم وجودها في المصدر). السبب المرجَّح: تعارض
+ * بين دالة min() القياسية في CSS ودالة min() المدمجة في Sass نفسه
+ * (بتتنفذ وقت compile وممكن ترفض خلط وحدات vw/px). الحل: قيمة px
+ * ثابتة بسيطة بلا أي دالة — أضمن. */
+@media (max-width: 480px) {
+	.page-title .title-text {
+		max-width: 180px !important;
+	}
+}
+
+/*
+ * 🔴 بلاغ المالك (٣ لقطات، جهازه الحقيقي): شريط عنوان شاشة القائمة
+ * ("فاتورة مبيعات") فاضل رماديًا رغم إن نفس الرأس في شاشة الفورم كحلي
+ * فعلاً — القيد السابق (ز.٥ أعلاه) كان مقصورًا على `.editable-form`
+ * بس. المالك رفض هذا التفاوت صراحة وطلب "الشريط العلوي كحلي في كل
+ * النظام" — القرار القديم بعدم توسيع النطاق أُلغي بطلب مباشر.
+ * السكوب الجديد اتفحص فعليًا لا افترض: صفحة القائمة عندها
+ * `data-page-route` تبدأ بـ"List/" (مؤكَّد بفحص DOM حيّ، القيمة
+ * الفعلية "List/Sales Invoice/List") — مختلفة عن "Workspaces" اللي
+ * عندها بالفعل تصميمها الزجاجي الفاتح المقصود فمش هتتأثر. أُضيف
+ * `[data-page-route^="List/"]` كخيار رابع جوه `:is()` الموجودة في كل
+ * قواعد `.page-head` أعلاه (٨ قواعد) — نفس التعديل، مش قواعد جديدة.
+ */
+
+/*
+ * الشريط العلوي (`.navbar`) — نفس البلاغ، طلب صريح "كحلي في كل
+ * النظام". كان شفافًا فاتحًا (`rgba(255,255,255,.55)`)، بيتناقض مع
+ * الرأس الكحلي تحته. كل عنصر داخله (روابط الفتات، أيقونة الإشعارات،
+ * شريط البحث، اللوجو) كانت ألوانه غامقة (مؤكَّدة بفحص computed style
+ * حيّ: `rgb(34,31,31)`/`rgb(82,82,82)`) فمحتاجة تبييض كامل، وإلا
+ * تختفي على الخلفية الكحلية الجديدة.
+ */
+.navbar {
+	background: var(--h-navy-600, #1D2D44) !important;
+	backdrop-filter: none !important;
+	-webkit-backdrop-filter: none !important;
+}
+
+.navbar #navbar-breadcrumbs a {
+	color: rgba(255, 255, 255, .85) !important;
+}
+
+.navbar .notifications-icon svg use,
+.navbar .notifications-icon svg {
+	fill: rgba(255, 255, 255, .85) !important;
+	color: rgba(255, 255, 255, .85) !important;
+}
+
+.navbar #navbar-search {
+	background: rgba(255, 255, 255, .18) !important;
+	color: #fff !important;
+	border: 1px solid rgba(255, 255, 255, .35) !important;
+}
+
+.navbar #navbar-search::placeholder {
+	color: rgba(255, 255, 255, .6) !important;
+}
+
+.navbar .search-icon svg use,
+.navbar .search-icon svg {
+	fill: rgba(255, 255, 255, .7) !important;
+}
+
+/* اللوجو أصله كحلي (`horizon-logo-navy.png`) — بلا تبييض هيختفي تمامًا
+ * على خلفية الـnavbar الكحلية الجديدة (نفس اللون تقريبًا). */
+.navbar .app-logo {
+	filter: brightness(0) invert(1);
+}
+
+/*
+ * 🔴 بلاغ المالك الثالث (لقطة desktop): بطاقة onboarding في صفحة
+ * الموديول رمادية مسطحة صلبة (`rgb(223,224,219)`، `border-radius:0`،
+ * بلا أي `backdrop-filter`) بينما كل عنصر تاني في نفس الصفحة (الفلاتر
+ * والبطاقات) عليه نفس نمط الزجاج الشفاف. مؤكَّد بفحص DOM حيّ —
+ * `.onboarding-widget-box`. نفس قيم `.standard-filter-section` أعلاه
+ * (تناسق النمط بدل قيم جديدة).
+ */
+.onboarding-widget-box {
+	background: linear-gradient(160deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .75)) !important;
+	backdrop-filter: blur(18px) saturate(160%);
+	-webkit-backdrop-filter: blur(18px) saturate(160%);
+	border: 1px solid rgba(255, 255, 255, .7);
+	border-radius: 16px !important;
+	box-shadow: 0 10px 26px rgba(29, 45, 68, .16), inset 0 1px 1px rgba(255, 255, 255, .85);
+}
+
+/*
+ * نفس البلاغ: زرّ "تحميل" أسفل جدول البنود (`.grid-download`) رمادي
+ * صلب بلا أي تنسيق — كلاس Bootstrap عام `.btn-secondary` (مؤكَّد بفحص
+ * DOM حيّ، نفس اللون `rgb(223,224,219)` بالضبط زي onboarding).
+ * السكوب مقيَّد بـ`.page-container` عمدًا — مش تعديل عام على كل
+ * `.btn-secondary` في النظام (مودالات إلخ) تفاديًا لتسريب نطاق غير
+ * مقصود، نفس منهجية بقية هذا الملف.
+ */
+.page-container .btn-secondary {
+	background: rgba(29, 45, 68, .08) !important;
+	border: 1px solid rgba(29, 45, 68, .18) !important;
+	color: var(--h-navy-600, #1D2D44) !important;
+}
