@@ -51,7 +51,7 @@ app_include_js = [
 # endpoint (it's allow_guest=True for exactly this reason).
 # ---------------------------------------------------------------------------
 web_include_css = [
-    "/assets/horizon_tab_theme/css/horizon_command_web.css",
+    "/assets/horizon_tab_theme/css/horizon_command_web.css?v=20260901a",  # كلاودفلير بيكاش الأصول الثابتة بلا نسخة — نفس درس app_include_css أعلاه
     "/api/method/horizon_tab_theme.api.theme_css",
 ]
 
