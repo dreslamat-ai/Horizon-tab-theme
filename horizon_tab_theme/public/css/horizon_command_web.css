@@ -11,7 +11,7 @@
   --h-shadow-2:0 20px 50px -18px rgba(16,26,43,.35);
   --h-font:'Tajawal','Inter',-apple-system,'Segoe UI',sans-serif;
 }
-body.login-page{
+body[data-path="login"]{
   font-family: var(--h-font);
   background: radial-gradient(1100px 600px at 50% -10%, var(--h-navy-700) 0%, var(--h-navy) 45%, var(--h-navy-950) 100%);
   min-height: 100vh;
@@ -26,7 +26,7 @@ body.login-page{
 .page-card-head h4, .page-card-head .card-title{
   color: var(--h-navy-900); font-weight: 900;
 }
-#login-page .app-logo, .login-content .app-logo{
+#page-login .app-logo, .login-content .app-logo{
   border-radius: var(--h-r-sm);
 }
 .btn-login, #page-login .btn-primary{
@@ -39,13 +39,13 @@ body.login-page{
    "Forgot password" / "Sign up instead" are the only links on this page, and
    they're navigational actions, not rendered content, so no exceptions
    needed here the way Desk needs them for comments/timeline text. */
-#login-page a, .for-forgot a, .for-signup a{
+#page-login a, .for-forgot a, .for-signup a{
   display: inline-flex; align-items: center; gap: 6px;
   padding: 5px 13px; border: 1.5px solid var(--h-navy); border-radius: 999px;
   color: var(--h-navy); background: #fff; font-weight: 700; font-size: .86em;
   text-decoration: none; transition: background .18s, color .18s;
 }
-#login-page a:hover, .for-forgot a:hover, .for-signup a:hover{
+#page-login a:hover, .for-forgot a:hover, .for-signup a:hover{
   background: var(--h-navy); color: #fff;
 }
 
