@@ -81,14 +81,18 @@ body[data-path="login"] .navbar-brand, body[data-path="login"] .navbar-nav .nav-
 .h-btn-cta:hover{ opacity:.9; color:var(--h-navy-950); }
 
 /* ====== بطاقة الدخول نفسها — نفس فورم فرابي، هوية جديدة ====== */
+/* frappe's own login.bundle.css targets ".for-login .page-card" etc — a
+   compound selector with higher specificity than a bare ".page-card", so it
+   wins the cascade regardless of load order. !important here is deliberate,
+   not sloppiness: matched to real specificity found in login.bundle.css. */
 .page-card{
-  border: 1px solid var(--h-line);
-  border-radius: var(--h-r-lg);
-  background: var(--h-glass);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 30px 60px -20px rgba(0,0,0,.5);
-  max-width:400px; width:100%;
-  padding: 2.25rem 2rem;
+  border: 1px solid var(--h-line) !important;
+  border-radius: var(--h-r-lg) !important;
+  background: var(--h-glass) !important;
+  backdrop-filter: blur(20px) !important;
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,.5) !important;
+  max-width:400px !important; width:100%;
+  padding: 2.25rem 2rem !important;
 }
 .page-card-head{ text-align:center; margin-bottom:1.5rem; }
 .page-card-head .indicator{ display:none; }
