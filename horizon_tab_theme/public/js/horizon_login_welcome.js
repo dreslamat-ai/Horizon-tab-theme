@@ -74,5 +74,18 @@
     loginBtn.parentElement.insertBefore(divider, emailLinkBtn);
   }
 
+  /* بديل الموبايل — عمود الترحيب الكامل يختفي تحت 900px (نفس البروتوتايب
+     حرفيًا)، فبلا هذا السطر يختفي أي أثر لدعوة التسجيل تمامًا على الموبايل
+     (بلاغ مالك حقيقي: "عند العملاء مش ظاهر إلا فورم الدخول من غير محتوى"،
+     من فتح الصفحة على موبايل فعليًا). يُحقَن داخل بطاقة الدخول نفسها —
+     ظاهر فقط تحت 900px عبر CSS، لا مكرَّر مع عمود الترحيب على الديسكتوب. */
+  var actions = document.querySelector("section.for-login .page-card-actions");
+  if (actions && !actions.querySelector(".h-mobile-cta")) {
+    var mobileCta = document.createElement("div");
+    mobileCta.className = "h-mobile-cta";
+    mobileCta.innerHTML = 'لسه معندكش حساب؟ <a href="' + SIGNUP_URL + '">سجّل شركتك الآن</a>';
+    actions.appendChild(mobileCta);
+  }
+
   void companyName; /* محجوز لاستخدام لاحق (تذييل مخصَّص) لو طُلب */
 })();

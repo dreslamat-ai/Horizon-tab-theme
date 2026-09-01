@@ -42,7 +42,16 @@ body[data-path="login"] .navbar-brand, body[data-path="login"] .navbar-nav .nav-
 @media (max-width:900px){
   #page-login.h-login-shell .page-content-wrapper{ grid-template-columns:1fr; }
   #page-login.h-login-shell .h-welcome{ display:none; }
+  #page-login.h-login-shell .h-mobile-cta{ display:block !important; }
 }
+
+/* بديل الموبايل — عمود الترحيب الكامل يختفي تحت 900px (زي البروتوتايب
+   الأصلي حرفيًا)، لكن لازم يبقى فيه أثر ما لدعوة التسجيل بدل اختفائها
+   بالكامل. مخفي افتراضيًا، يظهره الميديا كويري فوق فقط. */
+.h-mobile-cta{
+  display:none; margin-top:1.75rem; text-align:center; font-size:.85rem; color:var(--h-muted);
+}
+.h-mobile-cta a{ color:#fff; font-weight:700; text-decoration:underline; }
 
 /* ====== عمود الترحيب المحقون (h-welcome) ====== */
 .h-welcome{
