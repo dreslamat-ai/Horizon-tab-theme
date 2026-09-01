@@ -2,65 +2,127 @@
    HORIZON COMMAND — login / portal pages (/login, /me, error pages)
    These are served through Frappe's WEBSITE bundle, not the Desk bundle —
    horizon_desk.css never reaches this page, hence a separate small file.
+
+   نسخة ٣: مستوحاة من هوية horizonerp.cloud الفعلية (Cairo، زجاجي غامق،
+   عمود ترحيب + دعوة تسجيل يُحقَن بـ horizon_login_welcome.js). العمود
+   يظهر فقط عند وجود .h-login-shell على #page-login (يضيفه الـJS)، فغياب
+   الـJS لأي سبب لا يكسر شكل صفحة الدخول — يرجع الفورم البسيط فقط.
    ========================================================================== */
 :root{
   --h-navy-950:#101A2B; --h-navy-900:#16233A; --h-navy:#1D2D44; --h-navy-700:#2A3D5C; --h-navy-300:#7C8CA6;
-  --h-steel:#8FA8CC; --h-blue:#5083BC;
-  --h-ink:#1A1717; --h-muted:#4A5361; --h-line:#E3E5E0; --h-paper:#F7F8F6;
-  --h-r-lg:20px; --h-r-sm:10px;
-  --h-shadow-2:0 20px 50px -18px rgba(16,26,43,.35);
-  --h-font:'Tajawal','Inter',-apple-system,'Segoe UI',sans-serif;
+  --h-sky:#5083BC;
+  --h-ink:#EEF2F9; --h-muted:#9FB0C9; --h-line:rgba(255,255,255,.12);
+  --h-glass:rgba(255,255,255,.06); --h-glass-2:rgba(255,255,255,.08);
+  --h-r-lg:20px; --h-r-sm:12px;
+  --h-font:'Cairo','Tajawal','Inter',-apple-system,'Segoe UI',sans-serif;
 }
+
 body[data-path="login"]{
   font-family: var(--h-font);
-  background: radial-gradient(1100px 600px at 50% -10%, var(--h-navy-700) 0%, var(--h-navy) 45%, var(--h-navy-950) 100%);
+  background:
+    radial-gradient(900px 500px at 15% -10%, rgba(80,131,188,.25), transparent 60%),
+    radial-gradient(1000px 600px at 100% 10%, rgba(42,61,92,.5), transparent 55%),
+    var(--h-navy-950);
   min-height: 100vh;
+  color: var(--h-ink);
 }
-.page-card{
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: var(--h-r-lg);
-  box-shadow: var(--h-shadow-2);
-  background: #fff;
-}
-.page-card-head .indicator{ display:none; } /* default Frappe brand dot — the logo already carries the brand */
-.page-card-head h4, .page-card-head .card-title{
-  color: var(--h-navy-900); font-weight: 900;
-}
-#page-login .app-logo, .login-content .app-logo{
-  border-radius: var(--h-r-sm);
-}
-.btn-login, #page-login .btn-primary{
-  background: var(--h-navy) !important; border-color: var(--h-navy) !important;
-  border-radius: var(--h-r-sm); font-weight: 700;
-}
-.btn-login:hover{ background: var(--h-navy-700) !important; }
+body[data-path="login"] .navbar{ background: transparent !important; box-shadow: none !important; }
+body[data-path="login"] .navbar-brand, body[data-path="login"] .navbar-nav .nav-link{ color: var(--h-ink) !important; }
 
-/* links → chip buttons, same treatment and same reasoning as horizon_desk.css.
-   "Forgot password" / "Sign up instead" are the only links on this page, and
-   they're navigational actions, not rendered content, so no exceptions
-   needed here the way Desk needs them for comments/timeline text. */
+/* الحاوية الأصلية بتاعة فرابي — تتحول لعمودين لو الـJS حقن عمود الترحيب */
+#page-login.h-login-shell .page-content-wrapper{
+  display:grid; grid-template-columns:1.05fr 1fr; align-items:stretch; gap:0;
+  min-height:calc(100vh - 56px);
+}
+#page-login.h-login-shell .page-breadcrumbs,
+#page-login.h-login-shell .page-header-wrapper{ display:none; }
+#page-login.h-login-shell main.container{
+  max-width:none; display:flex; align-items:center; justify-content:center; padding:2.5rem 2rem;
+}
+@media (max-width:900px){
+  #page-login.h-login-shell .page-content-wrapper{ grid-template-columns:1fr; }
+  #page-login.h-login-shell .h-welcome{ display:none; }
+}
+
+/* ====== عمود الترحيب المحقون (h-welcome) ====== */
+.h-welcome{
+  display:flex; flex-direction:column; justify-content:center;
+  padding:4rem 3.5rem; position:relative; overflow:hidden;
+  border-inline-end:1px solid var(--h-line);
+}
+.h-welcome::before{
+  content:''; position:absolute; inset:0;
+  background:radial-gradient(600px 400px at 20% 20%, rgba(80,131,188,.18), transparent 70%);
+  pointer-events:none;
+}
+.h-welcome .h-eyebrow{ color:var(--h-sky); font-weight:800; font-size:.8rem; letter-spacing:.05em; margin-bottom:1rem; position:relative; }
+.h-welcome h1{ font-size:2rem; font-weight:800; line-height:1.35; margin:0 0 1rem; max-width:16ch; position:relative; color:var(--h-ink); }
+.h-welcome p.h-lede{ color:var(--h-muted); font-size:1rem; line-height:1.8; max-width:42ch; margin:0 0 2.25rem; position:relative; }
+
+.h-feature-list{ display:grid; gap:1.1rem; margin-bottom:2.25rem; position:relative; }
+.h-feature{ display:flex; gap:.85rem; align-items:flex-start; }
+.h-feature .h-icon{
+  flex:none; width:2.25rem; height:2.25rem; border-radius:10px;
+  background:var(--h-glass); border:1px solid var(--h-line);
+  display:flex; align-items:center; justify-content:center;
+}
+.h-feature .h-icon svg{ width:1.15rem; height:1.15rem; color:var(--h-sky); }
+.h-feature h3{ font-size:.95rem; font-weight:700; margin:0 0 .2rem; color:var(--h-ink); }
+.h-feature p{ font-size:.85rem; color:var(--h-muted); margin:0; line-height:1.6; }
+
+.h-cta-box{ background:var(--h-glass); border:1px solid var(--h-line); border-radius:var(--h-r-lg); padding:1.5rem 1.75rem; position:relative; }
+.h-cta-box p{ margin:0 0 1rem; font-size:.9rem; color:var(--h-ink); }
+.h-btn-cta{
+  display:inline-flex; align-items:center; gap:.5rem;
+  background:#fff; color:var(--h-navy-950); border:none; border-radius:999px;
+  padding:.7rem 1.5rem; font:inherit; font-weight:800; font-size:.9rem; text-decoration:none;
+}
+.h-btn-cta svg{ width:1rem; height:1rem; }
+.h-btn-cta:hover{ opacity:.9; color:var(--h-navy-950); }
+
+/* ====== بطاقة الدخول نفسها — نفس فورم فرابي، هوية جديدة ====== */
+.page-card{
+  border: 1px solid var(--h-line);
+  border-radius: var(--h-r-lg);
+  background: var(--h-glass);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 30px 60px -20px rgba(0,0,0,.5);
+  max-width:400px; width:100%;
+  padding: 2.25rem 2rem;
+}
+.page-card-head{ text-align:center; margin-bottom:1.5rem; }
+.page-card-head .indicator{ display:none; }
+.page-card-head .app-logo{ height:2.2rem; margin-bottom:1rem; border-radius:var(--h-r-sm); }
+.page-card-head h4, .page-card-head .card-title{ color: var(--h-ink); font-weight: 800; font-size:1.35rem; }
+.page-card-subtitle{ color:var(--h-muted); font-size:.9rem; }
+
+#page-login .app-logo, .login-content .app-logo{ border-radius: var(--h-r-sm); }
+
+.btn-login, #page-login .btn-primary{
+  background: #fff !important; color: var(--h-navy-950) !important; border-color: #fff !important;
+  border-radius: var(--h-r-sm); font-weight: 800;
+}
+.btn-login:hover{ opacity:.9; }
+
 #page-login a, .for-forgot a, .for-signup a{
   display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 13px; border: 1.5px solid var(--h-navy); border-radius: 999px;
-  color: var(--h-navy); background: #fff; font-weight: 700; font-size: .86em;
+  padding: 5px 13px; border: 1px solid var(--h-line); border-radius: 999px;
+  color: var(--h-ink); background: var(--h-glass); font-weight: 700; font-size: .86em;
   text-decoration: none; transition: background .18s, color .18s;
 }
-#page-login a:hover, .for-forgot a:hover, .for-signup a:hover{
-  background: var(--h-navy); color: #fff;
-}
+#page-login a:hover, .for-forgot a:hover, .for-signup a:hover{ background: var(--h-glass-2); }
 
-/* navy frame, in shades, on every control — same system as Desk's forms */
 .login-content .form-control, .page-card input, .page-card select{
-  border: 1.5px solid var(--h-navy-300);
-  border-radius: var(--h-r-sm);
-  background: linear-gradient(180deg, #fff, var(--h-paper) 180%);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.6);
-  transition: border-color .18s, box-shadow .18s;
+  border: 1px solid var(--h-line) !important;
+  border-radius: var(--h-r-sm) !important;
+  background: rgba(255,255,255,.05) !important;
+  color: var(--h-ink) !important;
 }
-.login-content .form-control:hover{ border-color: var(--h-navy-500); }
+.login-content .form-control::placeholder{ color:#5C6C86; }
 .login-content .form-control:focus{
-  border-color: var(--h-navy);
-  box-shadow: 0 0 0 3px rgba(29,45,68,.12), inset 0 1px 0 rgba(255,255,255,.6);
-  background: #fff;
+  border-color: var(--h-sky) !important;
+  box-shadow: 0 0 0 3px rgba(80,131,188,.18) !important;
+  background: rgba(255,255,255,.08) !important;
 }
-::selection{ background: var(--h-navy); color:#fff; }
+.login-content label{ color: var(--h-muted); font-size:.82rem; font-weight:600; }
+::selection{ background: var(--h-sky); color:#fff; }
