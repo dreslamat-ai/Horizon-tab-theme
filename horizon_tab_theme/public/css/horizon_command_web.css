@@ -94,33 +94,39 @@ body[data-path="login"] .navbar-brand, body[data-path="login"] .navbar-nav .nav-
   max-width:400px !important; width:100%;
   padding: 2.25rem 2rem !important;
 }
+/* ============================================================================
+   من هنا لآخر الملف: كل قيمة (padding/font-size/radius) منسوخة حرفيًا من
+   البروتوتايب المعتمد (login-v3.html) — لا تخمين ولا "قريب كفاية". فرابي
+   يحمّل الحقول والأزرار بكلاسات bootstrap (btn-sm خصوصًا) بمقاسات مختلفة
+   تمامًا، فكل قيمة هنا !important عن قصد لتطابق البروتوتايب حرفيًا، لا
+   لإهمال في كتابة الـCSS.
+   ========================================================================== */
 .page-card-head{ text-align:center; margin-bottom:1.5rem; }
 .page-card-head .indicator{ display:none; }
 .page-card-head .app-logo{ height:2.2rem; margin-bottom:1rem; border-radius:var(--h-r-sm); }
-.page-card-head h4, .page-card-head .card-title{ color: var(--h-ink); font-weight: 800; font-size:1.35rem; }
-.page-card-subtitle{ color:var(--h-muted); font-size:.9rem; }
+.page-card-head h4, .page-card-head .card-title{ color: var(--h-ink) !important; font-weight: 800 !important; font-size:1.35rem !important; margin:0 0 .35rem !important; }
+.page-card-subtitle{ color:var(--h-muted) !important; font-size:.9rem !important; margin:0 0 1.75rem !important; }
 
 #page-login .app-logo, .login-content .app-logo{ border-radius: var(--h-r-sm); }
 
-.btn-login, #page-login .btn-primary{
-  background: #fff !important; color: var(--h-navy-950) !important; border-color: #fff !important;
-  border-radius: var(--h-r-sm); font-weight: 800;
+/* التسمية — label{font-size:.82rem; font-weight:600; margin-bottom:.4rem} في البروتوتايب */
+.login-content .form-label, .login-content label{
+  color: var(--h-muted) !important; font-size:.82rem !important; font-weight:600 !important;
+  margin-bottom:.4rem !important; display:block;
 }
-.btn-login:hover{ opacity:.9; }
 
-#page-login a, .for-forgot a, .for-signup a{
-  display: inline-flex; align-items: center; gap: 6px;
-  padding: 5px 13px; border: 1px solid var(--h-line); border-radius: 999px;
-  color: var(--h-ink); background: var(--h-glass); font-weight: 700; font-size: .86em;
-  text-decoration: none; transition: background .18s, color .18s;
-}
-#page-login a:hover, .for-forgot a:hover, .for-signup a:hover{ background: var(--h-glass-2); }
+/* كل مجموعة حقل — .field{margin-bottom:1.15rem} في البروتوتايب */
+.login-content .form-group{ margin-bottom:1.15rem !important; }
 
+/* الحقل نفسه — .field input{padding:.8rem 1rem; font-size:.95rem; border-radius:12px} */
 .login-content .form-control, .page-card input, .page-card select{
   border: 1px solid var(--h-line) !important;
   border-radius: var(--h-r-sm) !important;
   background: rgba(255,255,255,.05) !important;
   color: var(--h-ink) !important;
+  padding: .8rem 1rem !important;
+  font-size: .95rem !important;
+  height:auto !important;
 }
 .login-content .form-control::placeholder{ color:#5C6C86; }
 .login-content .form-control:focus{
@@ -128,5 +134,40 @@ body[data-path="login"] .navbar-brand, body[data-path="login"] .navbar-nav .nav-
   box-shadow: 0 0 0 3px rgba(80,131,188,.18) !important;
   background: rgba(255,255,255,.08) !important;
 }
-.login-content label{ color: var(--h-muted); font-size:.82rem; font-weight:600; }
+/* الأيقونات الصغيرة داخل الحقل (بريد/قفل/عين) — لونها الافتراضي غامق يختفي على خلفيتنا الغامقة */
+.login-content .field-icon, .login-content .toggle-password{ color: var(--h-muted) !important; opacity:.9; }
+
+/* رابط "هل نسيت كلمة السر؟" — .forgot{padding:.35rem .9rem; font-size:.82rem; radius:999px} شكل chip صغير */
+.forgot-password-message{ margin-bottom:1.5rem !important; text-align:end; }
+.forgot-password-message a{
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: .35rem .9rem !important; border: 1px solid var(--h-line); border-radius: 999px;
+  color: var(--h-ink) !important; background: var(--h-glass); font-weight: 700; font-size: .82rem !important;
+  text-decoration: none; transition: background .18s;
+}
+.forgot-password-message a:hover{ background: var(--h-glass-2); }
+
+/* زرار "استمر" — .btn-primary{padding:.9rem; font-size:.98rem; font-weight:800} عرض كامل، أبيض */
+.btn-login{
+  background: #fff !important; color: var(--h-navy-950) !important; border-color: #fff !important;
+  border-radius: var(--h-r-sm) !important; font-weight: 800 !important;
+  padding: .9rem !important; font-size: .98rem !important; height:auto !important;
+  width:100%;
+}
+.btn-login:hover{ opacity:.9; }
+
+/* زرار "تسجيل الدخول برابط البريد الإلكتروني" — .btn-secondary{padding:.85rem; font-size:.92rem; font-weight:600} عرض كامل، شفاف بحدود */
+.btn-login-with-email-link{
+  display:flex !important; align-items:center; justify-content:center;
+  background: transparent !important; color: var(--h-ink) !important; border: 1px solid var(--h-line) !important;
+  border-radius: var(--h-r-sm) !important; font-weight: 600 !important;
+  padding: .85rem !important; font-size: .92rem !important; height:auto !important;
+  width:100%; text-decoration:none;
+}
+.btn-login-with-email-link:hover{ background: var(--h-glass) !important; color: var(--h-ink) !important; }
+
+/* فاصل "أو" بين الزرارين — يُحقَن بـ horizon_login_welcome.js (غير موجود في HTML فرابي أصلاً) */
+.h-divider{ display:flex; align-items:center; gap:.75rem; margin:1.5rem 0; color:var(--h-muted); font-size:.8rem; }
+.h-divider::before, .h-divider::after{ content:''; flex:1; height:1px; background:var(--h-line); }
+
 ::selection{ background: var(--h-sky); color:#fff; }

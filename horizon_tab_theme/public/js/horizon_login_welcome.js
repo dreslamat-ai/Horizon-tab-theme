@@ -56,5 +56,23 @@
     img.src = logoSrc;
     head.insertBefore(img, head.firstChild);
   }
+
+  /* فاصل "أو" بين زرّي "استمر" و"تسجيل الدخول برابط البريد" — موجود في
+     البروتوتايب المعتمد لكن غير موجود في page-card-actions الأصلي لفرابي،
+     فيُحقَن هنا بدل تعديل قالب فرابي نفسه. */
+  /* .btn-login و.btn-login-with-email-link موجودان أكثر من مرة في نفس
+     الصفحة (فرابي بيرندر كل أقسام for-login/for-forgot/for-login-with-
+     email-link معًا في الـDOM، ويظهر واحدًا بس بالـJS) — لازم النطاق
+     داخل section.for-login تحديدًا لضمان أخذ الزرّين من نفس الأب. */
+  var loginSection = document.querySelector("section.for-login");
+  var loginBtn = loginSection && loginSection.querySelector(".btn-login");
+  var emailLinkBtn = loginSection && loginSection.querySelector(".btn-login-with-email-link");
+  if (loginBtn && emailLinkBtn && loginBtn.parentElement === emailLinkBtn.parentElement) {
+    var divider = document.createElement("div");
+    divider.className = "h-divider";
+    divider.textContent = "أو";
+    loginBtn.parentElement.insertBefore(divider, emailLinkBtn);
+  }
+
   void companyName; /* محجوز لاستخدام لاحق (تذييل مخصَّص) لو طُلب */
 })();
